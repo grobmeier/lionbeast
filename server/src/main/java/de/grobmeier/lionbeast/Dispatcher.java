@@ -10,6 +10,8 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetEncoder;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -95,5 +97,20 @@ public class Dispatcher {
 
         keys.remove();
         key.interestOps(0);
+
+
+        CharsetEncoder charsetEncoder = Charset.forName("UTF-8").newEncoder();
+
+
+
+        String headers = "HTTP/1.1 200 OK\r\n" + "Content-type: text/html\r\n"
+                + "Connection: close\r\n\r\n";
+
+        String body = "Hello World";
+
+        channel.write(ByteBuffer.wrap(headers.getBytes()));
+        channel.write(ByteBuffer.wrap(body.getBytes()));
+
+        channel.close();
     }
 }
