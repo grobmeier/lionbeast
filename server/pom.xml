@@ -11,12 +11,21 @@
     <groupId>de.grobmeier.lionbeast</groupId>
     <artifactId>server</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <name>server</name>
-    <url>http://maven.apache.org</url>
+    <name>Lionbeast Server</name>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <dependencies>
+        <dependency>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-api</artifactId>
+        </dependency>
+
+        <dependency>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-log4j12</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
