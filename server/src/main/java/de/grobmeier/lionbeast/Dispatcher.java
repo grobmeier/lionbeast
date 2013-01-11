@@ -14,6 +14,9 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class Dispatcher {
     private static final Logger logger = LoggerFactory.getLogger(Dispatcher.class);
@@ -22,12 +25,15 @@ public class Dispatcher {
     private int port;
 
     private Selector selector;
+    private ExecutorService executorService;
 
     public Dispatcher(String host, int port) throws IOException {
         this.host = host;
         this.port = port;
 
         selector = Selector.open();
+
+        executorService = Executors.newFixedThreadPool(10, new WorkerThreadFactory());
     }
 
     /**
@@ -62,7 +68,7 @@ public class Dispatcher {
                     read(selectionKeys, key);
                 } else if(key.isWritable()) {
                     logger.debug("Request is writeable");
-                    write(selectionKeys, key);
+                    process(selectionKeys, key);
                 }
             }
         }
@@ -109,30 +115,9 @@ public class Dispatcher {
      * @param key the current key
      * @throws IOException if writing failed
      */
-    void write(Iterator<SelectionKey> keys, SelectionKey key) throws IOException {
-        logger.debug("WRITING");
-        SocketChannel channel = (SocketChannel) key.channel();
-
-        CharsetEncoder charsetEncoder = Charset.forName("UTF-8").newEncoder();
-
-        String headers = "HTTP/1.1 200 OK\r\n" + "Content-type: text/html\r\nConnection: close\r\n\r\n";
-        String body = "Hello World";
-
-        channel.write(ByteBuffer.wrap(headers.getBytes()));
-        channel.write(ByteBuffer.wrap(body.getBytes()));
-
-        // TODO if keepalive
-//        Socket socket = channel.socket();
-//        socket.setKeepAlive(true);
-//        socket.setSoTimeout(200);
-        // TODO register new readable
-
+    void process(Iterator<SelectionKey> keys, SelectionKey key) throws IOException {
+        executorService.submit(new Worker(keys, key));
         keys.remove();
-        key.interestOps(0);
-
-        // Close, if not kept alive
-        channel.close();
-        key.cancel();
     }
 
     /**
