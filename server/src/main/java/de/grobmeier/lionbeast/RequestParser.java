@@ -6,6 +6,9 @@ import org.slf4j.LoggerFactory;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Parses the incoming HTTP request.
@@ -14,7 +17,7 @@ public class RequestParser {
     private static final Logger logger = LoggerFactory.getLogger(RequestParser.class);
 
     public enum State {
-        NOT_STARTED, STARTED, COMPLETED;
+        NOT_STARTED, STARTED, HEADER_COMPLETED;
     }
 
     State current = State.NOT_STARTED;
@@ -27,7 +30,9 @@ public class RequestParser {
     private StringBuilder sink = new StringBuilder();
     private StringBuilder line = new StringBuilder();
 
-    public boolean onRead(ByteBuffer buffer) {
+    private Map<String, String> headers;
+
+    boolean onRead(ByteBuffer buffer) {
         CharBuffer charBuffer = UTF8_CHARSET.decode(buffer);
         sink.append( charBuffer.toString() );
 
@@ -49,6 +54,15 @@ public class RequestParser {
                         logger.warn("CharBuffer has remaining chars, but the end of the header has been reached");
                     }
                     logger.debug("Reached the end of header");
+                    current = State.HEADER_COMPLETED;
+
+                    if(logger.isDebugEnabled()) {
+                        Set<String> keys = headers.keySet();
+                        for (String key : keys) {
+                            logger.debug("Found header: {} -> {}", key, headers.get(key));
+                        }
+                    }
+
                     return true;
                 }
                 interpretLine();
@@ -63,6 +77,16 @@ public class RequestParser {
 
     private void interpretLine() {
         logger.debug(line.toString());
+
+        if(headers == null) {
+            headers = new HashMap<String, String>();
+            headers.put("start-line", line.toString());
+        } else {
+            String[] split = line.toString().split(":");
+            headers.put(split[0], split[1].trim());
+        }
+
+
         line = new StringBuilder();
     }
 }
