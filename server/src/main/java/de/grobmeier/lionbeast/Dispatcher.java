@@ -36,7 +36,7 @@ public class Dispatcher {
      * @throws IOException if binding to port/ip or selecting messages fail
      */
     void listen() throws IOException {
-        createWorker(host, port);
+        createChannel(host, port);
 
         while (true) {
             logger.debug("Selecting");
@@ -76,11 +76,11 @@ public class Dispatcher {
      * @param port the port to bind
      * @throws IOException if the channel could not be established
      */
-    private void createWorker(String host, int port) throws IOException {
-        ServerSocketChannel worker = ServerSocketChannel.open();
-        worker.socket().bind(new InetSocketAddress(host, port));
-        worker.configureBlocking(false);
-        worker.register(selector, SelectionKey.OP_ACCEPT);
+    private void createChannel(String host, int port) throws IOException {
+        ServerSocketChannel channel = ServerSocketChannel.open();
+        channel.socket().bind(new InetSocketAddress(host, port));
+        channel.configureBlocking(false);
+        channel.register(selector, SelectionKey.OP_ACCEPT);
     }
 
     /**
