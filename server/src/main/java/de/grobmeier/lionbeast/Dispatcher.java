@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
-import java.nio.channels.SelectableChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
@@ -147,7 +146,7 @@ public class Dispatcher {
         logger.debug("READING");
         SocketChannel channel = (SocketChannel) key.channel();
 
-        ByteBuffer buffer = ByteBuffer.allocate(1024);
+        ByteBuffer buffer = ByteBuffer.allocate(10);
         RequestParser parser = new RequestParser();
 
         boolean endOfStream = false;
