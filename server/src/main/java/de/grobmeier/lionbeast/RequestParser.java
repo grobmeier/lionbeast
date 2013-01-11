@@ -32,6 +32,11 @@ class RequestParser {
 
     private Map<String, String> headers;
 
+    /**
+     * Returns a Request object which contains the headers.
+     *
+     * @return the Request
+     */
     Request request() {
         if (current == State.NOT_STARTED || current == State.STARTED) {
             logger.warn("Request has not fully read yet");
@@ -43,6 +48,12 @@ class RequestParser {
         return result;
     }
 
+    /**
+     * Executed on read event
+     *
+     * @param buffer the received data from the client
+     * @return true, if the end of headers have been reached
+     */
     boolean onRead(ByteBuffer buffer) {
         CharBuffer charBuffer = UTF8_CHARSET.decode(buffer);
         sink.append( charBuffer.toString() );
@@ -57,7 +68,7 @@ class RequestParser {
 
             current = State.STARTED;
 
-            // Assuming LINEFEEDs do not come as part of the header data, I can use them as line terminator for headers
+            //  Linefeeds are not allowed inside datablocks and can be used as line terminators (without CR)
             if (c == LINEFEED) {
                 if(line.length() == 0) {
                     // Header ends here
@@ -86,17 +97,31 @@ class RequestParser {
         return false;
     }
 
+    /**
+     * Interprets the currently read line, puts the information into the headers map
+     * and resets the line field.
+     *
+     * Start-Line will be split by SP, according to:
+     *
+     * http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html#sec5
+     * Request-Line = Method SP Request-URI SP HTTP-Version CRLF
+     *
+     * Example:
+     *
+     * GET /favicon.ico HTTP/1.1
+     *
+     * will be available as "start-line". The split parts will be available
+     * as "method", "request-uri" and "http-version".
+     *
+     * Other headers are split by colon and stored as key/value pairs without further
+     * processing.
+     */
     private void interpretLine() {
-        logger.debug(line.toString());
-
         if(headers == null) {
             headers = new HashMap<String, String>();
             String startLine = line.toString();
             headers.put("start-line", startLine);
 
-            // Startlines look like that: GET /favicon.ico HTTP/1.1
-            // http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html#sec5
-            // Request-Line = Method SP Request-URI SP HTTP-Version CRLF
             String[] startLineParts = startLine.split(" ");
 
             if(startLineParts.length != 3) {
@@ -113,7 +138,6 @@ class RequestParser {
             String[] split = line.toString().split(":");
             headers.put(split[0], split[1].trim());
         }
-
 
         line = new StringBuilder();
     }
