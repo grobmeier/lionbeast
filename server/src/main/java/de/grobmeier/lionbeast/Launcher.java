@@ -11,10 +11,10 @@ import java.io.IOException;
 public class Launcher {
     private static final Logger logger = LoggerFactory.getLogger(Launcher.class);
 
+    // TODO: read port and host from configuration
     public void launch() throws IOException {
-        Dispatcher dispatcher = new Dispatcher();
-        // TODO: read from configuration
-        dispatcher.listen("localhost", 10000);
+        Dispatcher dispatcher = new Dispatcher("localhost", 10000);
+        dispatcher.listen();
     }
 
     public static void main(String[] args) throws Exception {
