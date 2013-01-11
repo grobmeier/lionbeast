@@ -13,10 +13,10 @@ import java.util.Set;
 /**
  * Parses the incoming HTTP request.
  */
-public class RequestParser {
+class RequestParser {
     private static final Logger logger = LoggerFactory.getLogger(RequestParser.class);
 
-    public enum State {
+    enum State {
         NOT_STARTED, STARTED, HEADER_COMPLETED;
     }
 
@@ -31,6 +31,17 @@ public class RequestParser {
     private StringBuilder line = new StringBuilder();
 
     private Map<String, String> headers;
+
+    Request request() {
+        if (current == State.NOT_STARTED || current == State.STARTED) {
+            logger.warn("Request has not fully read yet");
+        }
+
+        Request result = new Request();
+        result.setHeaders(headers);
+
+        return result;
+    }
 
     boolean onRead(ByteBuffer buffer) {
         CharBuffer charBuffer = UTF8_CHARSET.decode(buffer);
@@ -80,7 +91,24 @@ public class RequestParser {
 
         if(headers == null) {
             headers = new HashMap<String, String>();
-            headers.put("start-line", line.toString());
+            String startLine = line.toString();
+            headers.put("start-line", startLine);
+
+            // Startlines look like that: GET /favicon.ico HTTP/1.1
+            // http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html#sec5
+            // Request-Line = Method SP Request-URI SP HTTP-Version CRLF
+            String[] startLineParts = startLine.split(" ");
+
+            if(startLineParts.length != 3) {
+                logger.error("Start-Line has not the expected size");
+                // TODO: server can come done because of this. Throw exception, catch it in the main loop
+                // throw new HttpException(400);
+            }
+
+            headers.put("method", startLineParts[0]);
+            headers.put("request-uri", startLineParts[1]);
+            headers.put("http-version", startLineParts[2]);
+
         } else {
             String[] split = line.toString().split(":");
             headers.put(split[0], split[1].trim());

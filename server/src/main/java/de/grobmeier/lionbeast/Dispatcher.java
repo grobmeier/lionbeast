@@ -157,6 +157,6 @@ public class Dispatcher {
         }
 
         channel.configureBlocking(false);
-        channel.register(selector, SelectionKey.OP_WRITE);
+        channel.register(selector, SelectionKey.OP_WRITE, parser.request());
     }
 }
