@@ -1,5 +1,6 @@
 package de.grobmeier.lionbeast;
 
+import de.grobmeier.lionbeast.configuration.Configurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,7 +13,9 @@ public class Launcher {
     private static final Logger logger = LoggerFactory.getLogger(Launcher.class);
 
     // TODO: read port and host from configuration
-    public void launch() throws IOException {
+    public void launch() throws IOException, ServerInitializationException {
+        Configurator.configure();
+
         Dispatcher dispatcher = new Dispatcher("localhost", 10000);
         dispatcher.listen();
     }
