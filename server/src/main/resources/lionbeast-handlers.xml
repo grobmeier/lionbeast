@@ -1,0 +1,3 @@
+<lionbeast-handlers>
+    <handler name="helloworld" className="de.grobmeier.lionbeast.handlers.HelloWorldHandler" />
+</lionbeast-handlers>
