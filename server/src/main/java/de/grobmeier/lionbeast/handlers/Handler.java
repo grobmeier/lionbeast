@@ -18,22 +18,7 @@ import java.util.Map;
  */
 public interface Handler {
 
-    StatusCode prepare() throws IOException;
-
-    void content(Pipe.SinkChannel sinkChannel) throws IOException;
-
-    /**
-     * Returns the content type provided by this handler.
-     *
-     * Content types are provided as Strings, despite the existence of {ContentType}.
-     * If a third party handler wants to return an exotic content type he should be allowed to do so easily
-     * and without dealing with internal classes.
-     *
-     * @return the content type as text representation
-     * @see de.grobmeier.lionbeast.ContentType
-     */
-    String getContentType();
-
-    Map<String, String> getAdditionalHeaders();
+    void process() throws IOException;
+    void setChannel(Pipe.SinkChannel sinkChannel);
 
 }

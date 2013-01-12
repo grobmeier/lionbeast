@@ -12,7 +12,7 @@ public class Request {
     public Request() {
     }
 
-    void setHeaders(Map<String, String> headers) {
+    public void setHeaders(Map<String, String> headers) {
         this.headers = headers;
     }
 

@@ -5,7 +5,8 @@ package de.grobmeier.lionbeast;
  */
 public enum ContentType {
 
-    TEXT_PLAIN("text/plain");
+    TEXT_PLAIN("text/plain"),
+    TEXT_HTML("text/html");;
 
     String type;
 

@@ -1,5 +1,6 @@
 package de.grobmeier.lionbeast.handlers;
 
+import de.grobmeier.lionbeast.Request;
 import de.grobmeier.lionbeast.configuration.Configurator;
 import junit.framework.Assert;
 import org.junit.Before;
@@ -27,8 +28,11 @@ public class HandlerFactoryTest {
         headers.put("request-uri", "/index.html");
         headers.put("method", "GET");
 
+        Request request = new Request();
+        request.setHeaders(headers);
+
         HandlerFactory factory = new HandlerFactory();
-        Handler handler = factory.createHandler(headers);
+        Handler handler = factory.createHandler(request);
 
         Assert.assertNotNull(handler);
         Assert.assertEquals("de.grobmeier.lionbeast.handlers.HelloWorldHandler", handler.getClass().getCanonicalName());
@@ -40,8 +44,11 @@ public class HandlerFactoryTest {
         headers.put("request-uri", "/helloworld");
         headers.put("method", "GET");
 
+        Request request = new Request();
+        request.setHeaders(headers);
+
         HandlerFactory factory = new HandlerFactory();
-        Handler handler = factory.createHandler(headers);
+        Handler handler = factory.createHandler(request);
 
         Assert.assertNotNull(handler);
         Assert.assertEquals("de.grobmeier.lionbeast.handlers.HelloWorldHandler", handler.getClass().getCanonicalName());

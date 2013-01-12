@@ -18,7 +18,7 @@ import java.util.concurrent.Callable;
 /**
  * The worker processes the actual request. It is expected the headers are already read, but
  * the body of the request has not been touched yet. This is beneficial when it comes to bigger uploads,
- * as they are not blocking the main thread until the content is read.
+ * as they are not blocking the main thread until the process is read.
  *
  * Every request gets it's own worker which is ultimately running in an ExecutorService.
  */
@@ -46,26 +46,18 @@ class Worker implements Callable {
 
     @Override
     public Object call() throws Exception {
-        logger.debug("Running worker with name: {}", Thread.currentThread().getName());
+        logger.debug("WRITING worker with name: {}", Thread.currentThread().getName());
 
-        logger.debug("WRITING");
         SocketChannel channel = (SocketChannel) key.channel();
-
-        CharsetEncoder charsetEncoder = Charset.forName("UTF-8").newEncoder();
-
-        // TODO Serialize handlers
-        String headers = "HTTP/1.1 200 OK\r\n" + "Content-type: text/html\r\nConnection: close\r\n\r\n";
-        channel.write(ByteBuffer.wrap(headers.getBytes()));
-
         Request request = (Request) key.attachment();
+
         Handler handler = handlerFactory.createHandler(request);
 
-        StatusCode prepare = handler.prepare();
-        String contentType = handler.getContentType();
-
         Pipe pipe = Pipe.open();
-        handler.content( pipe.sink() );
         Pipe.SourceChannel source = pipe.source();
+
+        handler.setChannel(pipe.sink());
+        handler.process();
 
         ByteBuffer allocate = ByteBuffer.allocate(1000);
         while (source.read(allocate) != -1) {
