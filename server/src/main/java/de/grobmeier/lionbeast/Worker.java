@@ -60,7 +60,7 @@ class Worker implements Callable {
         // TODO chose between handler
         // HandlerPipeline: on file ending
         Request request = (Request) key.attachment();
-        Handler handler = handlerFactory.createHandler(request.getHeaders());
+        Handler handler = handlerFactory.createHandler(request);
 
         StatusCode prepare = handler.prepare();
         String contentType = handler.getContentType();

@@ -1,5 +1,6 @@
 package de.grobmeier.lionbeast.handlers;
 
+import de.grobmeier.lionbeast.Request;
 import de.grobmeier.lionbeast.configuration.Configurator;
 import de.grobmeier.lionbeast.configuration.HandlerConfiguration;
 import de.grobmeier.lionbeast.configuration.HandlerDefinition;
@@ -20,7 +21,9 @@ public class HandlerFactory {
     private HandlerConfiguration handlerConfiguration = Configurator.getInstance().getHandlerConfiguration();
     private MatcherConfiguration matcherConfiguration = Configurator.getInstance().getMatcherConfiguration();
 
-    public Handler createHandler(Map<String, String> headers) {
+    public Handler createHandler(Request request) {
+        Map<String, String> headers = request.getHeaders();
+
         String ref = checkMatchingPath(headers);
         if (ref == null) {
             ref = checkFileEnding(headers);
