@@ -14,7 +14,7 @@ import java.util.Map;
 /**
  * The matcher configuration
  */
-class MatcherConfiguration {
+public class MatcherConfiguration {
     private List<Matcher> matchers = new ArrayList<Matcher>();
 
     private Map<String, Matcher> fileEndingMatcher = new HashMap<String, Matcher>();
@@ -86,5 +86,13 @@ class MatcherConfiguration {
      */
     public List<Matcher> getMatchers() {
         return matchers;
+    }
+
+    public Map<String, Matcher> getFileEndingMatcher() {
+        return fileEndingMatcher;
+    }
+
+    public Map<String, Matcher> getPathMatcher() {
+        return pathMatcher;
     }
 }

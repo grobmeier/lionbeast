@@ -1,5 +1,6 @@
 package de.grobmeier.lionbeast;
 
+import de.grobmeier.lionbeast.handlers.HandlerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,6 +27,8 @@ public class Dispatcher {
 
     private Selector selector;
     private ExecutorService executorService;
+
+    private HandlerFactory handlerFactory = new HandlerFactory();
 
     public Dispatcher(String host, int port) throws IOException {
         this.host = host;
@@ -116,7 +119,7 @@ public class Dispatcher {
      * @throws IOException if writing failed
      */
     void process(Iterator<SelectionKey> keys, SelectionKey key) throws IOException {
-        executorService.submit(new Worker(keys, key));
+        executorService.submit(new Worker(keys, key, handlerFactory));
 
         keys.remove();
         key.interestOps(0);

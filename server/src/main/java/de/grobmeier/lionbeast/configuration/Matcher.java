@@ -3,7 +3,7 @@ package de.grobmeier.lionbeast.configuration;
 /**
  * The definition of a Matcher
  */
-class Matcher {
+public class Matcher {
     private Type type;
     private String ref;
     private String expression;

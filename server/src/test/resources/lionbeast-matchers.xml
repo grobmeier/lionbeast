@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <config>
     <matchers>
+        <match type="PATH" ref="helloworld">/helloworld</match>
         <match type="FILEENDING" ref="helloworld">.html</match>
         <match type="FILEENDING" ref="helloworld">.shtml</match>
         <match type="FILEENDING" ref="helloworld">.htm</match>

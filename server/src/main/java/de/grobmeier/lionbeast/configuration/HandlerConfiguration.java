@@ -47,6 +47,10 @@ public class HandlerConfiguration {
        return this.handlers.get(name);
     }
 
+    public Map<String, HandlerDefinition> getHandlers() {
+        return handlers;
+    }
+
     private void initHandlers(XMLConfiguration config) {
         List<HierarchicalConfiguration> handlers = config.configurationsAt("handlers.handler");
         for (HierarchicalConfiguration handler : handlers) {

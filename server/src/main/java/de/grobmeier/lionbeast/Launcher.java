@@ -16,6 +16,14 @@ public class Launcher {
     public void launch() throws IOException, ServerInitializationException {
         Configurator.configure();
 
+        if ( Configurator.getInstance().getHandlerConfiguration().getHandlers().size() == 0 ) {
+            logger.warn("No handlers specified in lionbeast-handlers.xml");
+        }
+
+        if ( Configurator.getInstance().getMatcherConfiguration().getMatchers().size() == 0 ) {
+            logger.warn("No matchers specified in lionbeast-matchers.xml");
+        }
+
         Dispatcher dispatcher = new Dispatcher("localhost", 10000);
         dispatcher.listen();
     }

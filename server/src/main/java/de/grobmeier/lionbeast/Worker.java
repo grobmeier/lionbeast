@@ -1,12 +1,12 @@
 package de.grobmeier.lionbeast;
 
+import de.grobmeier.lionbeast.handlers.Handler;
+import de.grobmeier.lionbeast.handlers.HandlerFactory;
 import de.grobmeier.lionbeast.handlers.HelloWorldHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.ByteBuffer;
-import java.nio.channels.ByteChannel;
-import java.nio.channels.Channel;
 import java.nio.channels.Pipe;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
@@ -16,21 +16,32 @@ import java.util.Iterator;
 import java.util.concurrent.Callable;
 
 /**
- * TODO: JavaDoc
- * <p/>
- * (c) 2013 Christian Grobmeier Software
- * All rights reserved.
- * mailto:cg@grobmeier.de
+ * The worker processes the actual request. It is expected the headers are already read, but
+ * the body of the request has not been touched yet. This is beneficial when it comes to bigger uploads,
+ * as they are not blocking the main thread until the content is read.
+ *
+ * Every request gets it's own worker which is ultimately running in an ExecutorService.
  */
 class Worker implements Callable {
     private static final Logger logger = LoggerFactory.getLogger(Worker.class);
 
     private Iterator<java.nio.channels.SelectionKey> keys;
     private SelectionKey key;
+    private HandlerFactory handlerFactory;
 
-    Worker(Iterator<SelectionKey> keys, SelectionKey key) {
+    /**
+     * Constructs a worker with dependencies. The handler factory is instantiated only one time by the Dispatcher.
+     * The keys are related to the actual request.
+     *
+     * The worker gets dependencies injected on constructor level.
+     * @param keys the selected keys
+     * @param key the selected key
+     * @param handlerFactory the handler factory
+     */
+    Worker(Iterator<SelectionKey> keys, SelectionKey key, HandlerFactory handlerFactory) {
         this.keys = keys;
         this.key = key;
+        this.handlerFactory = handlerFactory;
     }
 
     @Override
@@ -48,7 +59,9 @@ class Worker implements Callable {
 
         // TODO chose between handler
         // HandlerPipeline: on file ending
-        HelloWorldHandler handler = new HelloWorldHandler();
+        Request request = (Request) key.attachment();
+        Handler handler = handlerFactory.createHandler(request.getHeaders());
+
         StatusCode prepare = handler.prepare();
         String contentType = handler.getContentType();
 
