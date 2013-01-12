@@ -2,7 +2,6 @@ package de.grobmeier.lionbeast;
 
 import de.grobmeier.lionbeast.handlers.Handler;
 import de.grobmeier.lionbeast.handlers.HandlerFactory;
-import de.grobmeier.lionbeast.handlers.HelloWorldHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,8 +9,6 @@ import java.nio.ByteBuffer;
 import java.nio.channels.Pipe;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
 import java.util.Iterator;
 import java.util.concurrent.Callable;
 
@@ -44,6 +41,7 @@ class Worker implements Callable {
         this.handlerFactory = handlerFactory;
     }
 
+    // TODO: do not throw exception
     @Override
     public Object call() throws Exception {
         logger.debug("WRITING worker with name: {}", Thread.currentThread().getName());
