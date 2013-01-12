@@ -57,8 +57,6 @@ class Worker implements Callable {
         String headers = "HTTP/1.1 200 OK\r\n" + "Content-type: text/html\r\nConnection: close\r\n\r\n";
         channel.write(ByteBuffer.wrap(headers.getBytes()));
 
-        // TODO chose between handler
-        // HandlerPipeline: on file ending
         Request request = (Request) key.attachment();
         Handler handler = handlerFactory.createHandler(request);
 
