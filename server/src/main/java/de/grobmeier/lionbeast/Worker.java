@@ -5,6 +5,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.ByteBuffer;
+import java.nio.channels.ByteChannel;
+import java.nio.channels.Channel;
+import java.nio.channels.Pipe;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.Charset;
@@ -39,16 +42,27 @@ class Worker implements Callable {
 
         CharsetEncoder charsetEncoder = Charset.forName("UTF-8").newEncoder();
 
+        // TODO Serialize handlers
         String headers = "HTTP/1.1 200 OK\r\n" + "Content-type: text/html\r\nConnection: close\r\n\r\n";
-        String body = "Hello World";
-
         channel.write(ByteBuffer.wrap(headers.getBytes()));
-        channel.write(ByteBuffer.wrap(body.getBytes()));
 
         // TODO chose between handler
         // HandlerPipeline: on file ending
-        //
-        new HelloWorldHandler();
+        HelloWorldHandler handler = new HelloWorldHandler();
+        StatusCode prepare = handler.prepare();
+        String contentType = handler.getContentType();
+
+        Pipe pipe = Pipe.open();
+        handler.content( pipe.sink() );
+        Pipe.SourceChannel source = pipe.source();
+
+        ByteBuffer allocate = ByteBuffer.allocate(1000);
+        while (source.read(allocate) != -1) {
+            allocate.flip();
+            channel.write(allocate);
+            allocate.clear();
+        }
+        source.close();
 
         // TODO if keepalive
         //        Socket socket = channel.socket();
@@ -56,14 +70,8 @@ class Worker implements Callable {
         //        socket.setSoTimeout(200);
         // TODO register new readable
 
-
-        key.interestOps(0);
-
         // Close, if not kept alive
         channel.close();
-        key.cancel();
-
-
 
         return null;
     }

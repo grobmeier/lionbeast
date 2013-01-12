@@ -62,7 +62,7 @@ public class Dispatcher {
 
                 if (key.isAcceptable()) {
                     logger.debug("Request is acceptable");
-                    accept(key);
+                    accept(selectionKeys, key);
                 } else if (key.isReadable()) {
                     logger.debug("Request is readable");
                     read(selectionKeys, key);
@@ -94,10 +94,10 @@ public class Dispatcher {
      * @param key the selection key
      * @throws IOException if accepting didn't work
      */
-    void accept(SelectionKey key) throws IOException {
+    void accept(Iterator<SelectionKey> keys, SelectionKey key) throws IOException {
         logger.debug("ACCEPTING");
-        ServerSocketChannel serverSocketChannel = (ServerSocketChannel)key.channel();
 
+        ServerSocketChannel serverSocketChannel = (ServerSocketChannel)key.channel();
         SocketChannel accepted = serverSocketChannel.accept();
 
         // can return null in non-blocking mode
@@ -117,7 +117,9 @@ public class Dispatcher {
      */
     void process(Iterator<SelectionKey> keys, SelectionKey key) throws IOException {
         executorService.submit(new Worker(keys, key));
+
         keys.remove();
+        key.interestOps(0);
     }
 
     /**
@@ -129,6 +131,7 @@ public class Dispatcher {
      */
     void read(Iterator<SelectionKey> keys, SelectionKey key) throws IOException {
         logger.debug("READING");
+
         SocketChannel channel = (SocketChannel) key.channel();
 
         ByteBuffer buffer = ByteBuffer.allocate(10);
