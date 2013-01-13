@@ -19,7 +19,7 @@ import java.util.Map;
  */
 public interface Handler {
 
-    void process() throws IOException;
+    void process() throws HandlerException;
     void setChannel(Pipe.SinkChannel sinkChannel);
     void setRequest(Request request);
     void setDefaultContentType(String contentType);

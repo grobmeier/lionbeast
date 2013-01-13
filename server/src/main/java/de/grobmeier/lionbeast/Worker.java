@@ -2,10 +2,13 @@ package de.grobmeier.lionbeast;
 
 import de.grobmeier.lionbeast.configuration.Configurator;
 import de.grobmeier.lionbeast.handlers.Handler;
+import de.grobmeier.lionbeast.handlers.HandlerException;
 import de.grobmeier.lionbeast.handlers.HandlerFactory;
+import de.grobmeier.lionbeast.handlers.ServerStatusHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.Pipe;
 import java.nio.channels.SelectionKey;
@@ -42,9 +45,8 @@ class Worker implements Callable {
         this.handlerFactory = handlerFactory;
     }
 
-    // TODO: do not throw exception
     @Override
-    public Object call() throws Exception {
+    public Object call() {
         logger.debug("WRITING worker with name: {}", Thread.currentThread().getName());
 
         SocketChannel channel = (SocketChannel) key.channel();
@@ -56,32 +58,72 @@ class Worker implements Callable {
                 Configurator.getInstance().getServerConfiguration().welcomeFile());
         }
 
-        Handler handler = handlerFactory.createHandler(request);
+        try {
+            Handler handler = handlerFactory.createHandler(request);
+            write(handler, channel, request);
+        } catch (HandlerException e) {
+            handleException(channel, e);
+        } finally {
+            // TODO if keepalive
+            //        Socket socket = channel.socket();
+            //        socket.setKeepAlive(true);
+            //        socket.setSoTimeout(200);
+            // TODO register new readable
 
-        Pipe pipe = Pipe.open();
-        Pipe.SourceChannel source = pipe.source();
-
-        handler.setChannel(pipe.sink());
-        handler.setRequest(request);
-        handler.process();
-
-        ByteBuffer allocate = ByteBuffer.allocate(1000);
-        while (source.read(allocate) != -1) {
-            allocate.flip();
-            channel.write(allocate);
-            allocate.clear();
+            // Close, if not kept alive
+            try {
+                channel.close();
+            } catch (IOException e) {
+                logger.error("Could not close client channel.", e);
+            }
         }
-        source.close();
-
-        // TODO if keepalive
-        //        Socket socket = channel.socket();
-        //        socket.setKeepAlive(true);
-        //        socket.setSoTimeout(200);
-        // TODO register new readable
-
-        // Close, if not kept alive
-        channel.close();
 
         return null;
+    }
+
+    private void write(Handler handler, SocketChannel channel, Request request) throws HandlerException {
+        Pipe.SourceChannel source = null;
+        try {
+            Pipe pipe = openPipe();
+            source = pipe.source();
+
+            handler.setChannel(pipe.sink());
+            handler.setRequest(request);
+
+            handler.process();
+
+            ByteBuffer allocate = ByteBuffer.allocate(1000);
+            while (source.read(allocate) != -1) {
+                allocate.flip();
+                channel.write(allocate);
+                allocate.clear();
+            }
+        } catch (IOException e) {
+            logger.error("Cannot read from source or write to out. Cannot recover", e);
+        } finally {
+            try {
+                source.close();
+            } catch (IOException e) {
+                logger.error("Cannot close source channel. Please check OS for to many open file.", e);
+            }
+        }
+    }
+
+    private Pipe openPipe() throws HandlerException {
+        try {
+            return Pipe.open();
+        } catch (IOException e) {
+            throw new HandlerException(StatusCode.INTERNAL_SERVER_ERROR, "Cannot open pipe");
+        }
+    }
+
+    private void handleException(SocketChannel channel, HandlerException exception) {
+        try {
+            ServerStatusHandler handler = (ServerStatusHandler)handlerFactory.createHandler("serverStatus", "text/plain");
+            handler.setHandlerException(exception);
+            write(handler, channel, null);
+        } catch (HandlerException e) {
+            logger.error("Cannot output server status. Game over.");
+        }
     }
 }

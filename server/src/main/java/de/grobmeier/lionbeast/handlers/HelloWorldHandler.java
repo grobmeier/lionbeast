@@ -10,17 +10,19 @@ import java.nio.ByteBuffer;
  */
 public class HelloWorldHandler extends AbstractHandler {
     @Override
-    public void process() throws IOException {
-        this.streamStatusCode(StatusCode.OK);
-        this.streamHeaders("Content-Type", "text/html");
-        this.streamHeaders("Connection", "close");
+    public void process() throws HandlerException {
+        try {
+            this.streamStatusCode(StatusCode.OK);
+            this.streamHeaders("Content-Type", "text/html");
+            this.streamHeaders("Connection", "close");
 
-        // Get Data
-        String result = "Hello <b>World</b>, what's up?";
+            // Get Data
+            String result = "Hello <b>World</b>, what's up?";
 
-        this.streamData(ByteBuffer.wrap(result.getBytes()));
-        this.finish();
+            this.streamData(ByteBuffer.wrap(result.getBytes()));
+            this.finish();
+        } catch (IOException e) {
+            throw new HandlerException(StatusCode.INTERNAL_SERVER_ERROR, "Could not stream to client", e);
+        }
     }
-
-
 }

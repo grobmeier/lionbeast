@@ -1,6 +1,7 @@
 package de.grobmeier.lionbeast.handlers;
 
 import de.grobmeier.lionbeast.Request;
+import de.grobmeier.lionbeast.StatusCode;
 import de.grobmeier.lionbeast.configuration.Configurator;
 import de.grobmeier.lionbeast.configuration.HandlerConfiguration;
 import de.grobmeier.lionbeast.configuration.HandlerDefinition;
@@ -11,17 +12,20 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * TODO: JavaDoc
- * <p/>
- * (c) 2013 Christian Grobmeier Software
- * All rights reserved.
- * mailto:cg@grobmeier.de
+ * Class which creates handlers, either based on request or manually. Handlers are specified
+ * in lionbeast-handlers.xml.
  */
 public class HandlerFactory {
     private HandlerConfiguration handlerConfiguration = Configurator.getInstance().getHandlerConfiguration();
     private MatcherConfiguration matcherConfiguration = Configurator.getInstance().getMatcherConfiguration();
 
-    public Handler createHandler(Request request) {
+    /**
+     * Creates a handler based on the (header) information from the request.
+     * @param request the Request for which a handler needs to be created
+     * @return the ready to use handler
+     * @throws HandlerException if the handler could not be created or has not been found
+     */
+    public Handler createHandler(Request request) throws HandlerException {
         Map<String, String> headers = request.getHeaders();
 
         Matcher matcher = checkMatchingPath(headers);
@@ -30,31 +34,46 @@ public class HandlerFactory {
         }
 
         if (matcher == null) {
-            // TODO: throw checked server exception to be catched with showing BADREQUEST
+            throw new HandlerException(StatusCode.INTERNAL_SERVER_ERROR, "No matcher found for this request");
         }
 
-        HandlerDefinition definition = handlerConfiguration.getDefinitionByName(matcher.getRef());
+        return createHandler(matcher.getRef(), matcher.getDefaultContentType());
+    }
+
+    /**
+     * Creates a handler from reference. The reference is a unique key specified in lionbeast-handlers.xml.
+     *
+     * @param reference the reference for the handler
+     * @param defaultContentType the default content type of this handler
+     * @return the ready to use handler
+     * @throws HandlerException if the handler could not be created or has not been found
+     */
+    public Handler createHandler(String reference, String defaultContentType) throws HandlerException {
+        HandlerDefinition definition = handlerConfiguration.getDefinitionByName(reference);
+
+        if(definition == null) {
+            throw new HandlerException(StatusCode.INTERNAL_SERVER_ERROR, "No handler matching for this request");
+        }
 
         String className = definition.getClassName();
 
         try {
             Object o = Class.forName(className).newInstance();
             if (!(o instanceof Handler)) {
-                // TODO throw Serverexception: INTERNAL SERVER ERROR
+                throw new HandlerException(
+                        StatusCode.INTERNAL_SERVER_ERROR, "Handler class does not implement the Handler interface");
             }
             Handler handler = (Handler)o;
-            handler.setDefaultContentType(matcher.getDefaultContentType());
+            handler.setDefaultContentType(defaultContentType);
             return handler;
         } catch (InstantiationException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            throw new HandlerException(
+                    StatusCode.INTERNAL_SERVER_ERROR, "Cannot create handler instance. Null arg constructor given?", e);
         } catch (IllegalAccessException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            throw new HandlerException(StatusCode.INTERNAL_SERVER_ERROR, "No access to this handler.", e);
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            throw new HandlerException(StatusCode.INTERNAL_SERVER_ERROR, "Handler class found");
         }
-
-        // TODO throw Serverexception: INTERNAL SERVER ERROR
-        return null;
     }
 
     /**

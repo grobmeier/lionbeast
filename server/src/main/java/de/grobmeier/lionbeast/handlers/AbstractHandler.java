@@ -31,62 +31,76 @@ abstract class AbstractHandler implements Handler {
     protected Request request;
     protected String defaultContentType;
 
-    protected void streamStatusCode(StatusCode statusCode) throws IOException {
-        sinkChannel.write(protocol);
-        protocol.rewind();
+    protected void streamStatusCode(StatusCode statusCode) throws HandlerException {
         ByteBuffer statusLine = statusCode.getStatusLine();
-        sinkChannel.write(statusLine);
-        statusLine.rewind();
-        sinkChannel.write(CRLF);
-        CRLF.rewind();
-        streamingHeaders = true;
+        try {
+            streamingHeaders = true;
+            sinkChannel.write(protocol);
+            sinkChannel.write(statusLine);
+            sinkChannel.write(CRLF);
+        } catch (IOException e) {
+            throw new HandlerException(StatusCode.INTERNAL_SERVER_ERROR, "Cannot write to output channel");
+        } finally {
+            protocol.rewind();
+            statusLine.rewind();
+            CRLF.rewind();
+        }
     }
 
-    protected void streamDefaultContentType() throws IOException {
+    protected void streamDefaultContentType() throws HandlerException {
         this.streamHeaders("Content-Type", this.defaultContentType);
     }
 
-    protected void streamHeaders(String headerName, String headerValue) throws IOException {
+    protected void streamHeaders(String headerName, String headerValue) throws HandlerException {
         if(!streamingHeaders) {
             throw new IllegalStateException("Need to stream status code before streaming headers");
         }
 
         String s = new StringBuilder().append(headerName).append(": ").append(headerValue).toString();
-        sinkChannel.write(ByteBuffer.wrap(s.getBytes()));
-        sinkChannel.write(CRLF);
-        CRLF.rewind();
-    }
 
-    protected void streamData(ByteBuffer buffer) throws IOException {
-        if(streamingHeaders) {
-            sinkChannel.write(CRLF);
-            CRLF.rewind();
-            streamingHeaders = false;
-        }
-        sinkChannel.write(buffer);
-    }
-
-    protected void streamFile(String path) throws IOException {
-        FileInputStream fis = null;
         try {
-            fis = new FileInputStream(path);
+            sinkChannel.write(ByteBuffer.wrap(s.getBytes()));
+            sinkChannel.write(CRLF);
+        } catch (IOException e) {
+            throw new HandlerException(StatusCode.INTERNAL_SERVER_ERROR, "Cannot write to output channel");
+        } finally {
+            CRLF.rewind();
+        }
+    }
+
+    protected void streamData(ByteBuffer buffer) throws HandlerException {
+        try {
+            if (streamingHeaders) {
+                sinkChannel.write(CRLF);
+                streamingHeaders = false;
+            }
+            sinkChannel.write(buffer);
+        } catch (IOException e) {
+            throw new HandlerException(StatusCode.INTERNAL_SERVER_ERROR, "Cannot write to output channel");
+        } finally {
+            CRLF.rewind();
+        }
+    }
+
+    protected void streamFile(FileInputStream fis) throws HandlerException {
+        try {
             FileChannel fileChannel = fis.getChannel();
             ByteBuffer byteBuffer = ByteBuffer.allocate(1024);
 
             while (fileChannel.read(byteBuffer) != -1) {
                 byteBuffer.flip();
-                this.streamData( byteBuffer );
+                this.streamData(byteBuffer);
                 byteBuffer.clear();
             }
-        } catch (FileNotFoundException e) {
-            // TODO
-            e.printStackTrace();
         } catch (IOException e) {
-            // TODO
-            e.printStackTrace();
+            throw new HandlerException(StatusCode.INTERNAL_SERVER_ERROR, "Cannot write to output channel");
         } finally {
             if (fis != null) {
-                fis.close();
+                try {
+                    fis.close();
+                } catch (IOException e) {
+                    throw new HandlerException(StatusCode.INTERNAL_SERVER_ERROR, "Cannot close file input stream");
+                }
             }
         }
     }
