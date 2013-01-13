@@ -1,15 +1,9 @@
 package de.grobmeier.lionbeast.handlers;
 
-import de.grobmeier.lionbeast.ContentType;
-import de.grobmeier.lionbeast.Request;
 import de.grobmeier.lionbeast.StatusCode;
 import de.grobmeier.lionbeast.configuration.Configurator;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
 
 /**
  * Hello World Handler prints just... hello world.

@@ -1,6 +1,5 @@
 package de.grobmeier.lionbeast.handlers;
 
-import de.grobmeier.lionbeast.ContentType;
 import de.grobmeier.lionbeast.Request;
 import de.grobmeier.lionbeast.StatusCode;
 
