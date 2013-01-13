@@ -74,7 +74,7 @@ public class MatcherConfiguration {
         for (Matcher matcher : matchers) {
             if(Matcher.Type.FILEENDING == matcher.getType()) {
                 this.fileEndingMatcher.put(matcher.getExpression(), matcher);
-            } else if(Matcher.Type.FILEENDING == matcher.getType()) {
+            } else if(Matcher.Type.PATH == matcher.getType()) {
                 this.pathMatcher.put(matcher.getExpression(), matcher);
             }
         }
