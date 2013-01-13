@@ -26,7 +26,7 @@ import java.util.concurrent.Future;
  *
  * Every request gets it's own worker which is ultimately running in an ExecutorService.
  */
-class Worker implements Callable {
+class Worker implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(Worker.class);
 
     private Iterator<java.nio.channels.SelectionKey> keys;
@@ -52,7 +52,7 @@ class Worker implements Callable {
     }
 
     @Override
-    public Object call() {
+    public void run() {
         logger.debug("WRITING worker with name: {}", Thread.currentThread().getName());
 
         SocketChannel channel = (SocketChannel) key.channel();
@@ -83,10 +83,32 @@ class Worker implements Callable {
                 logger.error("Could not close client channel.", e);
             }
         }
-
-        return null;
     }
 
+    /**
+     * Writes the bytes from a handler back to the client.
+     *
+     * This operation will create another thread or use one from the executor service thread pool.
+     * This is necessary as the used Pipe will block when an OS dependent size of bytes have been put into
+     * the sink but not read.
+     *
+     * As it is not a good idea to read all files into memory (some might be huge) decision was to keep the Pipe
+     * implementation and make the read asynchronous.
+     *
+     * This will cause problems if the read has been interrupted: if in the middle of a read the operation is
+     * not longer possible, the headers for this request might have been sent already. With headers sent, it
+     * is not longer possible to send a different status code and show an error message (like Internal Server Error).
+     *
+     * This might be acceptable as this is an unlikely case. The win is quicker streams to the client.
+     *
+     * This operation does not close the SocketChannel to the client. But it takes care of its own resources,
+     * except of the sink, which needs to be closed by the resource reading thread when the read process is finished.
+     *
+     * @param handler the handler which will perform the data gathering
+     * @param channel the client channel to write the data
+     * @param request the original request
+     * @throws HandlerException if the operation could not complete normally
+     */
     private void write(Handler handler, SocketChannel channel, Request request) throws HandlerException {
         boolean streamingStarted = false;
         Pipe.SourceChannel source = null;
@@ -133,6 +155,11 @@ class Worker implements Callable {
         }
     }
 
+    /**
+     * Opens a pipe
+     * @return the pipe
+     * @throws HandlerException if the pipe could not be opened
+     */
     private Pipe openPipe() throws HandlerException {
         try {
             return Pipe.open();
@@ -141,6 +168,11 @@ class Worker implements Callable {
         }
     }
 
+    /**
+     * Takes care of an HandlerException and writes the appropriate Server status code to the client
+     * @param channel the channel to the client
+     * @param exception the exception which should be reported
+     */
     private void handleException(SocketChannel channel, HandlerException exception) {
         try {
             ServerStatusHandler handler = (ServerStatusHandler)handlerFactory.createHandler("serverStatus", "text/plain");
