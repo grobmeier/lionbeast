@@ -3,6 +3,7 @@
     <handlers>
         <handler name="helloworld" className="de.grobmeier.lionbeast.handlers.HelloWorldHandler" />
         <handler name="file" className="de.grobmeier.lionbeast.handlers.FileHandler" />
+        <handler name="jruby" className="de.grobmeier.lionbeast.handlers.JRubyFileHandler" />
 
         <handler name="serverStatus" className="de.grobmeier.lionbeast.handlers.ServerStatusHandler" />
     </handlers>

@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <config>
     <matchers>
+        <match type="FILEENDING" ref="jruby" contentType="text/html">rb</match>
+
         <match type="FILEENDING" ref="file" contentType="application/envoy">evy</match>
         <match type="FILEENDING" ref="file" contentType="application/fractals">fif</match>
         <match type="FILEENDING" ref="file" contentType="application/futuresplash">spl</match>
