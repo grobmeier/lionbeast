@@ -12,8 +12,8 @@ import java.io.IOException;
  */
 public class FileHandler extends AbstractHandler {
     @Override
-    public void process() throws HandlerException {
-        FileInputStream fis = null;
+    public Boolean call() throws HandlerException {
+        FileInputStream fis;
 
         try {
             String requestUri = this.request.getHeaders().get("request-uri");
@@ -33,6 +33,6 @@ public class FileHandler extends AbstractHandler {
         } catch (IOException e) {
             throw new HandlerException(StatusCode.INTERNAL_SERVER_ERROR, "Could not stream to client", e);
         }
-
+        return Boolean.TRUE;
     }
 }

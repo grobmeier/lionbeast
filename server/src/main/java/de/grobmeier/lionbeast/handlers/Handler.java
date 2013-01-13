@@ -9,6 +9,7 @@ import java.nio.channels.Channel;
 import java.nio.channels.Pipe;
 import java.nio.channels.SocketChannel;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 /**
  * TODO: JavaDoc
@@ -17,9 +18,8 @@ import java.util.Map;
  * All rights reserved.
  * mailto:cg@grobmeier.de
  */
-public interface Handler {
+public interface Handler extends Callable<Boolean> {
 
-    void process() throws HandlerException;
     void setChannel(Pipe.SinkChannel sinkChannel);
     void setRequest(Request request);
     void setDefaultContentType(String contentType);

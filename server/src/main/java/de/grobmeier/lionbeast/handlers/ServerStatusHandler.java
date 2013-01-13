@@ -14,7 +14,7 @@ public class ServerStatusHandler extends AbstractHandler {
     private HandlerException handlerException;
 
     @Override
-    public void process() throws HandlerException {
+    public Boolean call() throws HandlerException {
         try {
             this.streamStatusCode(handlerException.getStatusCode());
             this.streamHeaders("Content-Type", "text/html");
@@ -43,6 +43,7 @@ public class ServerStatusHandler extends AbstractHandler {
         } catch (IOException e) {
             throw new HandlerException(StatusCode.INTERNAL_SERVER_ERROR, "Could not stream to client", e);
         }
+        return Boolean.TRUE;
     }
 
     public void setHandlerException(HandlerException handlerException) {

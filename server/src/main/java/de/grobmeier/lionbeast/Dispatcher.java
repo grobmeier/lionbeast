@@ -11,13 +11,10 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 public class Dispatcher {
     private static final Logger logger = LoggerFactory.getLogger(Dispatcher.class);
@@ -27,6 +24,7 @@ public class Dispatcher {
 
     private Selector selector;
     private ExecutorService executorService;
+    private ExecutorService handlerExecutorService;
 
     private HandlerFactory handlerFactory = new HandlerFactory();
 
@@ -36,7 +34,9 @@ public class Dispatcher {
 
         selector = Selector.open();
 
+        // TODO: read thread count from config
         executorService = Executors.newFixedThreadPool(10, new WorkerThreadFactory());
+        handlerExecutorService = Executors.newFixedThreadPool(10, new WorkerThreadFactory());
     }
 
     /**
@@ -119,7 +119,7 @@ public class Dispatcher {
      * @throws IOException if writing failed
      */
     void process(Iterator<SelectionKey> keys, SelectionKey key) throws IOException {
-        executorService.submit(new Worker(keys, key, handlerFactory));
+        executorService.submit(new Worker(keys, key, handlerFactory, handlerExecutorService));
 
         keys.remove();
         key.interestOps(0);

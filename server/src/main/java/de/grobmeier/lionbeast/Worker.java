@@ -15,6 +15,9 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 
 /**
  * The worker processes the actual request. It is expected the headers are already read, but
@@ -29,6 +32,7 @@ class Worker implements Callable {
     private Iterator<java.nio.channels.SelectionKey> keys;
     private SelectionKey key;
     private HandlerFactory handlerFactory;
+    private ExecutorService executorService;
 
     /**
      * Constructs a worker with dependencies. The handler factory is instantiated only one time by the Dispatcher.
@@ -38,11 +42,13 @@ class Worker implements Callable {
      * @param keys the selected keys
      * @param key the selected key
      * @param handlerFactory the handler factory
+     * @param executorService Executor service for executing resource reading
      */
-    Worker(Iterator<SelectionKey> keys, SelectionKey key, HandlerFactory handlerFactory) {
+    Worker(Iterator<SelectionKey> keys, SelectionKey key, HandlerFactory handlerFactory, ExecutorService executorService) {
         this.keys = keys;
         this.key = key;
         this.handlerFactory = handlerFactory;
+        this.executorService = executorService;
     }
 
     @Override
@@ -82,6 +88,7 @@ class Worker implements Callable {
     }
 
     private void write(Handler handler, SocketChannel channel, Request request) throws HandlerException {
+        boolean streamingStarted = false;
         Pipe.SourceChannel source = null;
         try {
             Pipe pipe = openPipe();
@@ -90,19 +97,36 @@ class Worker implements Callable {
             handler.setChannel(pipe.sink());
             handler.setRequest(request);
 
-            handler.process();
+            Future<Boolean> future = executorService.submit(handler);
 
             ByteBuffer allocate = ByteBuffer.allocate(1000);
             while (source.read(allocate) != -1) {
                 allocate.flip();
-                channel.write(allocate);
+                int write = channel.write(allocate);
+                if(!streamingStarted && write != 0) {
+                    streamingStarted = true;
+                }
                 allocate.clear();
             }
+
+            future.get();
+        } catch (InterruptedException e) {
+            logger.error("Reader threw exception which cannot be recovered.", e);
+        } catch (ExecutionException e) {
+            Throwable cause = e.getCause();
+            if (!streamingStarted) {
+                if (cause instanceof HandlerException) {
+                    throw (HandlerException) cause;
+                }
+            }
+            logger.error("Reader threw exception which cannot be recovered.", e);
         } catch (IOException e) {
             logger.error("Cannot read from source or write to out. Cannot recover", e);
         } finally {
             try {
-                source.close();
+                if (source != null) {
+                    source.close();
+                }
             } catch (IOException e) {
                 logger.error("Cannot close source channel. Please check OS for to many open file.", e);
             }

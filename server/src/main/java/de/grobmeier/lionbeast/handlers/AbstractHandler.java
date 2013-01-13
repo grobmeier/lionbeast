@@ -2,6 +2,8 @@ package de.grobmeier.lionbeast.handlers;
 
 import de.grobmeier.lionbeast.Request;
 import de.grobmeier.lionbeast.StatusCode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -20,18 +22,17 @@ import java.util.Map;
  * mailto:cg@grobmeier.de
  */
 abstract class AbstractHandler implements Handler {
-
-    private Map<String, String> emptyHeaders = new HashMap<String, String>();
-
     protected ByteBuffer protocol = ByteBuffer.wrap("HTTP/1.1 ".getBytes());
     private ByteBuffer CRLF = ByteBuffer.wrap("\r\n".getBytes());
 
     private boolean streamingHeaders = false;
+
     protected Pipe.SinkChannel sinkChannel;
     protected Request request;
     protected String defaultContentType;
 
     protected void streamStatusCode(StatusCode statusCode) throws HandlerException {
+
         ByteBuffer statusLine = statusCode.getStatusLine();
         try {
             streamingHeaders = true;
@@ -70,15 +71,15 @@ abstract class AbstractHandler implements Handler {
 
     protected void streamData(ByteBuffer buffer) throws HandlerException {
         try {
-            if (streamingHeaders) {
-                sinkChannel.write(CRLF);
-                streamingHeaders = false;
-            }
+            sinkChannel.write(CRLF);
             sinkChannel.write(buffer);
         } catch (IOException e) {
             throw new HandlerException(StatusCode.INTERNAL_SERVER_ERROR, "Cannot write to output channel");
         } finally {
-            CRLF.rewind();
+            if (streamingHeaders) {
+                CRLF.rewind();
+                streamingHeaders = false;
+            }
         }
     }
 
