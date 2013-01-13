@@ -1,6 +1,7 @@
 package de.grobmeier.lionbeast;
 
 import de.grobmeier.lionbeast.configuration.Configurator;
+import de.grobmeier.lionbeast.configuration.ServerConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,8 +24,10 @@ public class Launcher {
         if ( Configurator.getInstance().getMatcherConfiguration().getMatchers().size() == 0 ) {
             logger.warn("No matchers specified in lionbeast-matchers.xml");
         }
+        ServerConfiguration serverConfiguration = Configurator.getInstance().getServerConfiguration();
 
-        Dispatcher dispatcher = new Dispatcher("localhost", 10000);
+        Dispatcher dispatcher =
+                new Dispatcher(serverConfiguration.bindTo(), serverConfiguration.port());
         dispatcher.listen();
     }
 

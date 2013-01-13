@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<config>
+    <bindTo>localhost</bindTo>
+    <port>10000</port>
+    <documentRoot>/Users/cy/Documents/Development/lionbeast/server/src/test/webdir</documentRoot>
+</config>

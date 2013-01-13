@@ -1,6 +1,7 @@
 package de.grobmeier.lionbeast.configuration;
 
 import de.grobmeier.lionbeast.ServerInitializationException;
+import org.apache.commons.configuration.XMLConfiguration;
 
 /**
  * Configurator holds the configurations necessary by the server. There should only be one Configurator object
@@ -9,6 +10,7 @@ import de.grobmeier.lionbeast.ServerInitializationException;
 public class Configurator {
     private HandlerConfiguration handlerConfiguration = new HandlerConfiguration();
     private MatcherConfiguration matcherConfiguration = new MatcherConfiguration();
+    private ServerConfiguration serverConfiguration = new ServerConfiguration();
 
     private static Configurator instance;
 
@@ -24,6 +26,7 @@ public class Configurator {
         instance = new Configurator();
         instance.handlerConfiguration.init();
         instance.matcherConfiguration.init();
+        instance.serverConfiguration.init();
     }
 
     /**
@@ -43,5 +46,9 @@ public class Configurator {
 
     public MatcherConfiguration getMatcherConfiguration() {
         return matcherConfiguration;
+    }
+
+    public ServerConfiguration getServerConfiguration() {
+        return serverConfiguration;
     }
 }
