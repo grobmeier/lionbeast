@@ -1,5 +1,6 @@
 package de.grobmeier.lionbeast;
 
+import de.grobmeier.lionbeast.configuration.Configurator;
 import de.grobmeier.lionbeast.handlers.Handler;
 import de.grobmeier.lionbeast.handlers.HandlerFactory;
 import org.slf4j.Logger;
@@ -48,6 +49,12 @@ class Worker implements Callable {
 
         SocketChannel channel = (SocketChannel) key.channel();
         Request request = (Request) key.attachment();
+
+        if ("/".equals(request.getHeaders().get("request-uri"))) {
+            logger.debug("Overwriting request-uri with welcome file (leaving original status line intact)");
+            request.getHeaders().put("request-uri",
+                Configurator.getInstance().getServerConfiguration().welcomeFile());
+        }
 
         Handler handler = handlerFactory.createHandler(request);
 

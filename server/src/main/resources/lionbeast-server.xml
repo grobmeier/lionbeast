@@ -3,4 +3,5 @@
     <bindTo>localhost</bindTo>
     <port>10000</port>
     <documentRoot>/Users/cy/Documents/Development/lionbeast/server/src/test/webdir</documentRoot>
+    <welcomeFile>/index.html</welcomeFile>
 </config>

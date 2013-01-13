@@ -35,4 +35,8 @@ public class ServerConfiguration {
     public String documentRoot() {
         return xmlConfiguration.getString("documentRoot");
     }
+
+    public String welcomeFile() {
+        return xmlConfiguration.getString("welcomeFile");
+    }
 }
