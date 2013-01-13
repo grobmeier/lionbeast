@@ -10,7 +10,8 @@ public enum StatusCode {
     OK(200, "OK"),
     BAD_REQUEST(400, "Bad Request"),
     FORBIDDEN(403, "Forbidden"),
-    NOT_FOUND(404, "Not Found");
+    NOT_FOUND(404, "Not Found"),
+    INTERNAL_SERVER_ERROR(505, "Internal Server Error");
 
     int code;
     String reasonPhrase;
@@ -26,6 +27,10 @@ public enum StatusCode {
 
     public int asInt() {
         return code;
+    }
+
+    public String getReasonPhrase() {
+        return reasonPhrase;
     }
 
     public ByteBuffer getStatusLine() {
