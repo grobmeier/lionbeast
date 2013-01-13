@@ -20,9 +20,12 @@ public class HelloWorldHandler extends AbstractHandler {
             String result = "Hello <b>World</b>, what's up?";
 
             this.streamData(ByteBuffer.wrap(result.getBytes()));
-            this.finish();
-        } catch (IOException e) {
-            throw new HandlerException(StatusCode.INTERNAL_SERVER_ERROR, "Could not stream to client", e);
+        } finally {
+            try {
+                this.finish();
+            } catch (IOException e) {
+                throw new HandlerException(StatusCode.INTERNAL_SERVER_ERROR, "Could not close pipe");
+            }
         }
         return Boolean.TRUE;
     }

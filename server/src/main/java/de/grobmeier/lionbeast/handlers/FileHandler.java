@@ -27,11 +27,17 @@ public class FileHandler extends AbstractHandler {
             this.streamHeaders("Connection", "close"); // TODO
 
             this.streamFile(fis);
-            this.finish();
+
         }  catch (FileNotFoundException e) {
             throw new HandlerException(StatusCode.NOT_FOUND);
         } catch (IOException e) {
             throw new HandlerException(StatusCode.INTERNAL_SERVER_ERROR, "Could not stream to client", e);
+        } finally {
+            try {
+                this.finish();
+            } catch (IOException e) {
+                throw new HandlerException(StatusCode.INTERNAL_SERVER_ERROR, "Could not close pipe");
+            }
         }
         return Boolean.TRUE;
     }
