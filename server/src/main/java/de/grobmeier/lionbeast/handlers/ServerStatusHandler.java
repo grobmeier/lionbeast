@@ -1,6 +1,8 @@
 package de.grobmeier.lionbeast.handlers;
 
 import de.grobmeier.lionbeast.StatusCode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -10,12 +12,18 @@ import java.nio.ByteBuffer;
  * Reports a server status
  */
 public class ServerStatusHandler extends AbstractHandler {
+    private static final Logger logger = LoggerFactory.getLogger(ServerStatusHandler.class);
 
     private HandlerException handlerException;
 
     @Override
     public Boolean call() throws HandlerException {
         try {
+            if(handlerException == null) {
+                logger.error("ServerStatusHandler is called without an exception.");
+                handlerException = new HandlerException(StatusCode.INTERNAL_SERVER_ERROR);
+            }
+
             this.streamStatusCode(handlerException.getStatusCode());
             this.streamHeaders("Content-Type", "text/html");
             this.streamHeaders("Connection", "close"); // TODO
@@ -28,20 +36,17 @@ public class ServerStatusHandler extends AbstractHandler {
                 .append(handlerException.getStatusCode().getReasonPhrase())
                 .append("</h1>");
 
-            if(handlerException != null) {
-                builder.append("<pre>").append(handlerException.toString()).append("</pre>");
-            }
 
+            builder.append("<pre>").append(handlerException.toString()).append("</pre>");
             builder.append(("</body></html>"));
 
-            this.streamData(
-                    ByteBuffer.wrap(builder.toString().getBytes()));
-
-            this.finish();
-        }  catch (FileNotFoundException e) {
-            throw new HandlerException(StatusCode.NOT_FOUND);
-        } catch (IOException e) {
-            throw new HandlerException(StatusCode.INTERNAL_SERVER_ERROR, "Could not stream to client", e);
+            this.streamData(ByteBuffer.wrap(builder.toString().getBytes()));
+        }  finally {
+            try {
+                this.finish();
+            } catch (IOException e) {
+                throw new HandlerException(StatusCode.INTERNAL_SERVER_ERROR, "Could not close pipe");
+            }
         }
         return Boolean.TRUE;
     }
