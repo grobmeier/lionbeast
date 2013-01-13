@@ -120,7 +120,6 @@ public class Dispatcher {
      */
     void process(Iterator<SelectionKey> keys, SelectionKey key) throws IOException {
         executorService.submit(new Worker(keys, key, handlerFactory, handlerExecutorService));
-
         keys.remove();
         key.interestOps(0);
     }
