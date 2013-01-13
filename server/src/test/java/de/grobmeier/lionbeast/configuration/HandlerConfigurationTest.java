@@ -1,6 +1,7 @@
 package de.grobmeier.lionbeast.configuration;
 
-import junit.framework.Assert;
+
+import org.junit.Assert;
 import org.junit.Test;
 
 /**

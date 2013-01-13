@@ -1,19 +1,8 @@
 package de.grobmeier.lionbeast.configuration;
 
-import junit.framework.Assert;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.ConfigurationFactory;
-import org.apache.commons.configuration.DefaultConfigurationBuilder;
-import org.apache.commons.configuration.HierarchicalConfiguration;
-import org.apache.commons.configuration.SubnodeConfiguration;
-import org.apache.commons.configuration.XMLConfiguration;
-import org.apache.commons.configuration.beanutils.BeanDeclaration;
-import org.apache.commons.configuration.beanutils.BeanHelper;
-import org.apache.commons.configuration.beanutils.XMLBeanDeclaration;
-import org.apache.commons.configuration.tree.ConfigurationNode;
+import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 

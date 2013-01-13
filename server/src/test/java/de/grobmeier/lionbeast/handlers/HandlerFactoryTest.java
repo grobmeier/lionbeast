@@ -2,7 +2,8 @@ package de.grobmeier.lionbeast.handlers;
 
 import de.grobmeier.lionbeast.Request;
 import de.grobmeier.lionbeast.configuration.Configurator;
-import junit.framework.Assert;
+
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
