@@ -12,7 +12,7 @@ public class HelloWorldHandler extends AbstractHandler {
     @Override
     public void process() throws IOException {
         this.streamStatusCode(StatusCode.OK);
-        this.streamHeaders("Content-Type", "text/plain");
+        this.streamHeaders("Content-Type", "text/html");
         this.streamHeaders("Connection", "close");
 
         // Get Data
