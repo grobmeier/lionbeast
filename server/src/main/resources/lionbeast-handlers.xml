@@ -2,6 +2,6 @@
 <config>
     <handlers>
         <handler name="helloworld" className="de.grobmeier.lionbeast.handlers.HelloWorldHandler" />
-        <handler name="goodbyeworld" className="de.grobmeier.lionbeast.handlers.GoodbyeWorldHandler" />
+        <handler name="file" className="de.grobmeier.lionbeast.handlers.FileHandler" />
     </handlers>
 </config>

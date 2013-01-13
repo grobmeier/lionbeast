@@ -24,16 +24,16 @@ public class HandlerFactory {
     public Handler createHandler(Request request) {
         Map<String, String> headers = request.getHeaders();
 
-        String ref = checkMatchingPath(headers);
-        if (ref == null) {
-            ref = checkFileEnding(headers);
+        Matcher matcher = checkMatchingPath(headers);
+        if (matcher == null) {
+            matcher = checkFileEnding(headers);
         }
 
-        if (ref == null) {
+        if (matcher == null) {
             // TODO: throw checked server exception to be catched with showing BADREQUEST
         }
 
-        HandlerDefinition definition = handlerConfiguration.getDefinitionByName(ref);
+        HandlerDefinition definition = handlerConfiguration.getDefinitionByName(matcher.getRef());
 
         String className = definition.getClassName();
 
@@ -42,7 +42,9 @@ public class HandlerFactory {
             if (!(o instanceof Handler)) {
                 // TODO throw Serverexception: INTERNAL SERVER ERROR
             }
-            return (Handler)o;
+            Handler handler = (Handler)o;
+            handler.setDefaultContentType(matcher.getDefaultContentType());
+            return handler;
         } catch (InstantiationException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         } catch (IllegalAccessException e) {
@@ -60,14 +62,14 @@ public class HandlerFactory {
      * @param headers the headers of this request
      * @return the handler name
      */
-    private String checkFileEnding(Map<String, String> headers) {
+    private Matcher checkFileEnding(Map<String, String> headers) {
         Map<String, Matcher> fileEndingMatcher = matcherConfiguration.getFileEndingMatcher();
         Set<String> fileEndings = fileEndingMatcher.keySet();
 
         String uri = headers.get("request-uri");
         for (String fileEnding : fileEndings) {
             if(uri.endsWith(fileEnding)) {
-                return fileEndingMatcher.get(fileEnding).getRef();
+                return fileEndingMatcher.get(fileEnding);
             }
         }
         return null;
@@ -78,13 +80,13 @@ public class HandlerFactory {
      * @param headers the headers of this request
      * @return the handler name
      */
-    private String checkMatchingPath(Map<String, String> headers) {
+    private Matcher checkMatchingPath(Map<String, String> headers) {
         Map<String, Matcher> pathMatcher = matcherConfiguration.getPathMatcher();
         Set<String> paths = pathMatcher.keySet();
 
         for (String path : paths) {
             if (path.equals(headers.get("request-uri"))) {
-                return pathMatcher.get(path).getRef();
+                return pathMatcher.get(path);
             }
         }
         return null;

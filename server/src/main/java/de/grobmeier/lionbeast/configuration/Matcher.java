@@ -7,7 +7,15 @@ public class Matcher {
     private Type type;
     private String ref;
     private String expression;
+    private String defaultContentType;
 
+    public String getDefaultContentType() {
+        return defaultContentType;
+    }
+
+    public void setDefaultContentType(String defaultContentType) {
+        this.defaultContentType = defaultContentType;
+    }
 
     public String getRef() {
         return ref;

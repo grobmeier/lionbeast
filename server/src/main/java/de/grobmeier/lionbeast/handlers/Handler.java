@@ -1,5 +1,6 @@
 package de.grobmeier.lionbeast.handlers;
 
+import de.grobmeier.lionbeast.Request;
 import de.grobmeier.lionbeast.StatusCode;
 
 import java.io.IOException;
@@ -20,5 +21,7 @@ public interface Handler {
 
     void process() throws IOException;
     void setChannel(Pipe.SinkChannel sinkChannel);
+    void setRequest(Request request);
+    void setDefaultContentType(String contentType);
 
 }

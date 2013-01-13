@@ -63,6 +63,8 @@ public class MatcherConfiguration {
                     entry.setType(value);
                 } else if ("ref".equalsIgnoreCase(attribute.getName())) {
                     entry.setRef(value);
+                } else if ("contentType".equalsIgnoreCase(attribute.getName())) {
+                    entry.setDefaultContentType(value);
                 }
             }
 

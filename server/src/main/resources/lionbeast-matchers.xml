@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <config>
     <matchers>
-        <match type="FILEENDING" ref="helloworld">.html</match>
-        <match type="FILEENDING" ref="helloworld">.shtml</match>
-        <match type="FILEENDING" ref="helloworld">.htm</match>
+        <match type="FILEENDING" ref="file" contentType="text/plain">txt</match>
+        <match type="FILEENDING" ref="file" contentType="text/html">html</match>
+        <match type="FILEENDING" ref="file" contentType="text/html">shtml</match>
+        <match type="FILEENDING" ref="file" contentType="text/html">htm</match>
     </matchers>
 </config>

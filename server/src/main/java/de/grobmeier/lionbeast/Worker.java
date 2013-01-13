@@ -55,6 +55,7 @@ class Worker implements Callable {
         Pipe.SourceChannel source = pipe.source();
 
         handler.setChannel(pipe.sink());
+        handler.setRequest(request);
         handler.process();
 
         ByteBuffer allocate = ByteBuffer.allocate(1000);
