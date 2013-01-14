@@ -28,6 +28,11 @@ import java.io.IOException;
 public class Launcher {
     private static final Logger logger = LoggerFactory.getLogger(Launcher.class);
 
+    /**
+     * Configures the application and launches the dispatcher
+     * @throws IOException if the dispatcher could not be created
+     * @throws ServerInitializationException if there was an error in server initialization
+     */
     public void launch() throws IOException, ServerInitializationException {
         Configurator.configure();
 
@@ -47,6 +52,11 @@ public class Launcher {
         dispatcher.listen();
     }
 
+    /**
+     * Main to start Lionbeast
+     * @param args not sued
+     * @throws Exception if a non recoverable exception occured
+     */
     public static void main(String[] args) throws Exception {
         logger.info("Starting Lionbeast");
         new Launcher().launch();
