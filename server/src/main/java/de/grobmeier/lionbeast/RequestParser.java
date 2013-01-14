@@ -66,7 +66,7 @@ class RequestParser {
     }
 
     /**
-     * Executed on read event
+     * Reads from a byte buffer and reasembles lines.
      *
      * @param buffer the received data from the client
      * @return true, if the end of headers have been reached
@@ -159,6 +159,7 @@ class RequestParser {
             headers.put(split[0], split[1].trim());
         }
 
+        // once the line has been interpreted, delete it
         line = new StringBuilder();
     }
 }
