@@ -9,6 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.channels.Pipe;
 import java.nio.channels.SelectionKey;
@@ -70,15 +72,17 @@ class Worker implements Runnable {
         } catch (HandlerException e) {
             handleException(channel, e);
         } finally {
-            // TODO if keepalive
-            //        Socket socket = channel.socket();
-            //        socket.setKeepAlive(true);
-            //        socket.setSoTimeout(200);
-            // TODO register new readable
+            Socket socket = channel.socket();
 
-            // Close, if not kept alive
+            // Close, if not keeping alive
             try {
-                channel.close();
+                if (socket.getKeepAlive()) {
+                    logger.debug("Keep alive detected, push BACK TO READ");
+                    key.channel().register(key.selector(), SelectionKey.OP_READ);
+                } else {
+                    logger.debug("Closing session");
+                    channel.close();
+                }
             } catch (IOException e) {
                 logger.error("Could not close client channel.", e);
             }

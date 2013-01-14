@@ -13,8 +13,8 @@ public class HelloWorldHandler extends AbstractHandler {
     public Boolean call() throws HandlerException {
         try {
             this.streamStatusCode(StatusCode.OK);
+            this.streamDefaultKeepAlive();
             this.streamHeaders("Content-Type", "text/html");
-            this.streamHeaders("Connection", "close");
 
             // Get Data
             String result = "Hello <b>World</b>, what's up?";

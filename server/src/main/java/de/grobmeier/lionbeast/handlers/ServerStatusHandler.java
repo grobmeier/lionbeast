@@ -25,8 +25,8 @@ public class ServerStatusHandler extends AbstractHandler {
             }
 
             this.streamStatusCode(handlerException.getStatusCode());
+            this.streamDefaultKeepAlive();
             this.streamHeaders("Content-Type", "text/html");
-            this.streamHeaders("Connection", "close"); // TODO
 
             StringBuilder builder = new StringBuilder();
             builder

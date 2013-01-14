@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
@@ -121,20 +122,33 @@ public class Dispatcher {
      * @throws IOException if writing failed
      */
     void process(Iterator<SelectionKey> keys, SelectionKey key) throws IOException {
-        executorService.submit(new Worker(keys, key, handlerFactory, handlerExecutorService));
+
+        Request request = (Request)key.attachment();
+
+        String connection = request.getHeaders().get("Connection");
+        if (connection != null && "Keep-Alive".equalsIgnoreCase(connection)) {
+            logger.debug("Marking keep alive connection");
+            Socket socket = ((SocketChannel)key.channel()).socket();
+            socket.setKeepAlive(true);
+            socket.setSoTimeout(100);
+        }
+
         keys.remove();
         key.interestOps(0);
+
+        executorService.submit(new Worker(keys, key, handlerFactory, handlerExecutorService));
+
     }
 
     /**
      * Reading from the selected channel
      *
-     * @param keys iterator to the currently selected keys
      * @param key the current key
      * @throws IOException if writing failed
      */
     void read(Iterator<SelectionKey> keys, SelectionKey key) throws IOException {
         logger.debug("READING");
+        logger.debug("Request listens: {}", ((SocketChannel)key.channel()).socket().getPort());
 
         SocketChannel channel = (SocketChannel) key.channel();
 
@@ -146,6 +160,14 @@ public class Dispatcher {
             buffer.flip();
             endOfStream = parser.onRead(buffer);
             buffer.clear();
+        }
+
+        if (parser.request().getHeaders() == null) {
+            logger.debug("Request timed out, nothing to do. Discarding");
+            key.cancel();
+            keys.remove();
+            channel.close();
+            return;
         }
 
         channel.configureBlocking(false);

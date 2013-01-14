@@ -2,17 +2,12 @@ package de.grobmeier.lionbeast.handlers;
 
 import de.grobmeier.lionbeast.Request;
 import de.grobmeier.lionbeast.StatusCode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.Pipe;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * TODO: JavaDoc
@@ -48,6 +43,10 @@ abstract class AbstractHandler implements Handler {
         }
     }
 
+    protected void streamDefaultKeepAlive() throws HandlerException {
+        this.streamHeaders("Connection", request.getHeaders().get("Connection"));
+    }
+
     protected void streamDefaultContentType() throws HandlerException {
         this.streamHeaders("Content-Type", this.defaultContentType);
     }
@@ -72,7 +71,7 @@ abstract class AbstractHandler implements Handler {
     protected void streamData(ByteBuffer buffer) throws HandlerException {
         try {
             if (streamingHeaders) {
-            sinkChannel.write(CRLF);
+                sinkChannel.write(CRLF);
             }
             sinkChannel.write(buffer);
         } catch (IOException e) {

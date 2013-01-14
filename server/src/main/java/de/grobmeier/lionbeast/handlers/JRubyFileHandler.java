@@ -27,8 +27,8 @@ public class JRubyFileHandler extends AbstractHandler {
             fis = new FileInputStream(root + requestUri);
 
             this.streamStatusCode(StatusCode.OK);
+            this.streamDefaultKeepAlive();
             this.streamDefaultContentType();
-            this.streamHeaders("Connection", "close"); // TODO
 
             ScriptingContainer container = new ScriptingContainer();
             container.setWriter(new WriterWrapper());

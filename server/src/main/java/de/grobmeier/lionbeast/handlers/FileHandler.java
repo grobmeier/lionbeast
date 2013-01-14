@@ -29,18 +29,16 @@ public class FileHandler extends AbstractHandler {
             fis = new FileInputStream(file);
 
             this.streamStatusCode(StatusCode.OK);
-            this.streamDefaultContentType();
 
-            this.streamHeaders("Connection", "close"); // TODO
             logger.debug("Streaming file with content-length: {}", fileLength);
             this.streamHeaders("Content-Length", Long.toString(fileLength));
 
-            this.streamFile(fis);
+            this.streamDefaultKeepAlive();
+            this.streamDefaultContentType();
 
+            this.streamFile(fis);
         }  catch (FileNotFoundException e) {
             throw new HandlerException(StatusCode.NOT_FOUND);
-        } catch (IOException e) {
-            throw new HandlerException(StatusCode.INTERNAL_SERVER_ERROR, "Could not stream to client", e);
         } finally {
             try {
                 this.finish();
