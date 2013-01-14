@@ -19,7 +19,10 @@ public class HelloWorldHandler extends AbstractHandler {
             // Get Data
             String result = "Hello <b>World</b>, what's up?";
 
-            this.streamData(ByteBuffer.wrap(result.getBytes()));
+            byte[] bytes = result.getBytes();
+            this.streamHeaders("Content-Length", Long.toString(bytes.length));
+
+            this.streamData(ByteBuffer.wrap(bytes));
         } finally {
             try {
                 this.finish();
