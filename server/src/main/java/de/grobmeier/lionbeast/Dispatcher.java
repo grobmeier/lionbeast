@@ -60,11 +60,11 @@ public class Dispatcher {
 
                 if (!key.isValid()) {
                     logger.debug("Invalid request, skipping");
+                    selectionKeys.remove();
                     continue;
                 }
 
                 if (key.isAcceptable()) {
-                    logger.debug("Request is acceptable");
                     accept(selectionKeys, key);
                 } else if (key.isReadable()) {
                     logger.debug("Request is readable");
