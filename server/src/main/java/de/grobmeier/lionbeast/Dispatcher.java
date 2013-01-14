@@ -87,6 +87,8 @@ public class Dispatcher {
      */
     private void createChannel(String host, int port) throws IOException {
         ServerSocketChannel channel = ServerSocketChannel.open();
+        // http://meteatamel.wordpress.com/2010/12/01/socket-reuseaddress-property-and-linux/
+        channel.socket().setReuseAddress(true);
         channel.socket().bind(new InetSocketAddress(host, port));
         channel.configureBlocking(false);
         channel.register(selector, SelectionKey.OP_ACCEPT);
