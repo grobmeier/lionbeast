@@ -71,7 +71,9 @@ abstract class AbstractHandler implements Handler {
 
     protected void streamData(ByteBuffer buffer) throws HandlerException {
         try {
+            if (streamingHeaders) {
             sinkChannel.write(CRLF);
+            }
             sinkChannel.write(buffer);
         } catch (IOException e) {
             throw new HandlerException(StatusCode.INTERNAL_SERVER_ERROR, "Cannot write to output channel");
