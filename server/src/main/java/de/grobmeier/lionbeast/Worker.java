@@ -70,11 +70,7 @@ class Worker implements Runnable {
         Request request = (Request)key.attachment();
         SocketChannel channel = (SocketChannel) key.channel();
 
-        if ("/".equals(request.getHeaders().get("request-uri"))) {
-            logger.debug("Overwriting request-uri with welcome file (leaving original status line intact)");
-            request.getHeaders().put("request-uri",
-                Configurator.getInstance().getServerConfiguration().welcomeFile());
-        }
+        checkForWelcomeFile(request);
 
         try {
             handleKeepAlive(request, channel);
@@ -97,6 +93,21 @@ class Worker implements Runnable {
             } catch (IOException e) {
                 logger.error("Could not close client channel.", e);
             }
+        }
+    }
+
+    /**
+     * Checks and (if it matches) replaces the request-uri with the uri of the welcome file.
+     *
+     * For example, if domain.tld is given, it might become domain.tld/index.html
+     *
+     * @param request the request to check
+     */
+    private void checkForWelcomeFile(Request request) {
+        if ("/".equals(request.getHeaders().get("request-uri"))) {
+            logger.debug("Overwriting request-uri with welcome file (leaving original status line intact)");
+            request.getHeaders().put("request-uri",
+                Configurator.getInstance().getServerConfiguration().welcomeFile());
         }
     }
 
