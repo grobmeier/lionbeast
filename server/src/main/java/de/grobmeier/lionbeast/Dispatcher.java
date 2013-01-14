@@ -107,6 +107,8 @@ public class Dispatcher {
 
         // can return null in non-blocking mode
         if (accepted == null) {
+            keys.remove();
+            key.cancel();
             return;
         }
 
