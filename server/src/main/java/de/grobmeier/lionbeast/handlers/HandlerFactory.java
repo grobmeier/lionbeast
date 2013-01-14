@@ -27,8 +27,9 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Class which creates handlers, either based on request or manually. Handlers are specified
- * in lionbeast-handlers.xml.
+ * Class which creates handlers, either based on request or manually.
+ *
+ * Handlers are specified in lionbeast-handlers.xml.
  */
 public class HandlerFactory {
     private HandlerConfiguration handlerConfiguration = Configurator.getInstance().getHandlerConfiguration();
@@ -36,6 +37,7 @@ public class HandlerFactory {
 
     /**
      * Creates a handler based on the (header) information from the request.
+     *
      * @param request the Request for which a handler needs to be created
      * @return the ready to use handler
      * @throws HandlerException if the handler could not be created or has not been found

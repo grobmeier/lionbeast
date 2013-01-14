@@ -25,24 +25,35 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.Pipe;
 
 /**
- * TODO: JavaDoc
- * <p/>
- * (c) 2013 Christian Grobmeier Software
- * All rights reserved.
- * mailto:cg@grobmeier.de
+ * An abstract handler implementation, providing serveral methods to write protocol,
+ * CRLF, status code and more.
+ *
+ * This class intention is some kind of utility class, providing common operations for handlers.
+ * It is not necessary to extend from this class; it is enough to implement the Handler interface
+ * to become a full fledged handler.
  */
 abstract class AbstractHandler implements Handler {
     protected ByteBuffer protocol = ByteBuffer.wrap("HTTP/1.1 ".getBytes());
-    private ByteBuffer CRLF = ByteBuffer.wrap("\r\n".getBytes());
+    protected ByteBuffer CRLF = ByteBuffer.wrap("\r\n".getBytes());
 
+    /* are the headers streaming? */
     private boolean streamingHeaders = false;
 
+    /* the place to write the content to */
     protected Pipe.SinkChannel sinkChannel;
+    /* the request  */
     protected Request request;
+    /* the default content type as defined in lionbeast-matchers.xml*/
     protected String defaultContentType;
 
+    /**
+     * Streams the status code (the whole line, which is protocol, status and phrase).
+     * Please note: only HTTP 1.1 is supported.
+     *
+     * @param statusCode the status code to stream
+     * @throws HandlerException if the output could not be written
+     */
     protected void streamStatusCode(StatusCode statusCode) throws HandlerException {
-
         ByteBuffer statusLine = statusCode.getStatusLine();
         try {
             streamingHeaders = true;
@@ -58,14 +69,28 @@ abstract class AbstractHandler implements Handler {
         }
     }
 
+    /**
+     * streams the default keep alive for this request, based on request header information.
+     * @throws HandlerException if the output could not be written
+     */
     protected void streamDefaultKeepAlive() throws HandlerException {
         this.streamHeaders("Connection", request.getHeaders().get("Connection"));
     }
 
+    /**
+     * streams the content type, base on lionbeast-matchers.xml
+     * @throws HandlerException if the output could not be written
+     */
     protected void streamDefaultContentType() throws HandlerException {
         this.streamHeaders("Content-Type", this.defaultContentType);
     }
 
+    /**
+     * Streams a header (key : value)
+     * @param headerName the header name
+     * @param headerValue the header value
+     * @throws HandlerException if the output could not be written
+     */
     protected void streamHeaders(String headerName, String headerValue) throws HandlerException {
         if(!streamingHeaders) {
             throw new IllegalStateException("Need to stream status code before streaming headers");
@@ -83,6 +108,11 @@ abstract class AbstractHandler implements Handler {
         }
     }
 
+    /**
+     * Streams a buffer of data to the sink
+     * @param buffer the data to stream
+     * @throws HandlerException if the output could not be written
+     */
     protected void streamData(ByteBuffer buffer) throws HandlerException {
         try {
             if (streamingHeaders) {
@@ -99,6 +129,11 @@ abstract class AbstractHandler implements Handler {
         }
     }
 
+    /**
+     * streams a whole file to the sink and closes the input stream after reading.
+     * @param fis the file input stream to read.
+     * @throws HandlerException if the output could not be written
+     */
     protected void streamFile(FileInputStream fis) throws HandlerException {
         try {
             FileChannel fileChannel = fis.getChannel();
@@ -122,6 +157,10 @@ abstract class AbstractHandler implements Handler {
         }
     }
 
+    /**
+     * Finishes the sink write
+     * @throws IOException if the sink could not be closed
+     */
     protected void finish() throws IOException {
         sinkChannel.close();
     }

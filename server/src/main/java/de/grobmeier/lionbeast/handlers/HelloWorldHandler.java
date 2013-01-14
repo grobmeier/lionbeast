@@ -22,6 +22,7 @@ import java.nio.ByteBuffer;
 
 /**
  * Hello World Handler prints just... hello world.
+ * An example for not selecting from hard disc.
  */
 public class HelloWorldHandler extends AbstractHandler {
     @Override

@@ -26,7 +26,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 /**
- * Hello World Handler prints just... hello world.
+ * The file handler takes a file based on the request uri and searches it in the web folder.
+ * If the file is not found, 404 will be delivered to the client.
+ * If the file is found, first the content-length will be delivered, followed by the file.
  */
 public class FileHandler extends AbstractHandler {
     private static final Logger logger = LoggerFactory.getLogger(FileHandler.class);

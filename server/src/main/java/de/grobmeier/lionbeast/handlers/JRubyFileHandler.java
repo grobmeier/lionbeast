@@ -80,7 +80,7 @@ public class JRubyFileHandler extends AbstractHandler {
     /*
      * Dear reader, I am sorry for this.
      */
-    private class WriterWrapper extends Writer {
+    private static class WriterWrapper extends Writer {
         StringBuilder builder = new StringBuilder();
 
         @Override

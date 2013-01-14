@@ -17,11 +17,13 @@ import java.util.Map;
 public class HandlerConfiguration {
     private Map<String, HandlerDefinition> handlers = new HashMap<String, HandlerDefinition>();
 
+    /* Only the configurator should create this object */
     HandlerConfiguration() {
     }
 
     /**
      * Initializes the handler configuration with lionbeast-handlers.xml
+     *
      * @return the ready to use HandlerConfiguration
      * @throws ServerInitializationException if the configuration could not be loaded
      */
@@ -47,10 +49,18 @@ public class HandlerConfiguration {
        return this.handlers.get(name);
     }
 
+    /**
+     * Returns a map of all handler definitions
+     * @return the map of handler definitions
+     */
     public Map<String, HandlerDefinition> getHandlers() {
         return handlers;
     }
 
+    /**
+     * Initializes all ahndlers
+     * @param config the configuration file (as xml)
+     */
     private void initHandlers(XMLConfiguration config) {
         List<HierarchicalConfiguration> handlers = config.configurationsAt("handlers.handler");
         for (HierarchicalConfiguration handler : handlers) {
@@ -71,5 +81,4 @@ public class HandlerConfiguration {
             this.handlers.put(definition.getName(), definition);
         }
     }
-
 }

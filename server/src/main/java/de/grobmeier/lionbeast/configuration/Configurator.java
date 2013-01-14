@@ -12,14 +12,17 @@ public class Configurator {
     private MatcherConfiguration matcherConfiguration = new MatcherConfiguration();
     private ServerConfiguration serverConfiguration = new ServerConfiguration();
 
+    /* Singleton instance, created at server start */
     private static Configurator instance;
 
+    /* Private to prevent others to create this object */
     private Configurator() {}
 
     /**
      * Loads the configurations.
      *
-     * This method is not threadsafe.
+     * This method is not thread safe.
+     *
      * @throws ServerInitializationException when the configuration could not be loaded
      */
     public static void configure() throws ServerInitializationException {
@@ -40,14 +43,26 @@ public class Configurator {
         return instance;
     }
 
+    /**
+     * Returns the handler configuration
+     * @return the handler configuration
+     */
     public HandlerConfiguration getHandlerConfiguration() {
         return handlerConfiguration;
     }
 
+    /**
+     * Returns the matcher configuration
+     * @return the matcher configuration
+     */
     public MatcherConfiguration getMatcherConfiguration() {
         return matcherConfiguration;
     }
 
+    /**
+     * Returns the server configuration
+     * @return the server configuration
+     */
     public ServerConfiguration getServerConfiguration() {
         return serverConfiguration;
     }

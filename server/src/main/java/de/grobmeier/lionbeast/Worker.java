@@ -63,6 +63,10 @@ class Worker implements Runnable {
         this.executorService = executorService;
     }
 
+    /**
+     * The worker run which runs a specific handler for a request.
+     * The worker also decides on keep alive or not (closing the channel or not).
+     */
     @Override
     public void run() {
         logger.debug("WRITING worker with name: {}", Thread.currentThread().getName());
@@ -147,17 +151,18 @@ class Worker implements Runnable {
 
             Future<Boolean> future = executorService.submit(handler);
 
-            ByteBuffer allocate = ByteBuffer.allocate(1000);
-            while (source.read(allocate) != -1) {
-                allocate.flip();
-                int write = channel.write(allocate);
+            ByteBuffer buffer = ByteBuffer.allocate(1000);
+            while (source.read(buffer) != -1) {
+                buffer.flip();
+                // this is the actual write to the client
+                int write = channel.write(buffer);
                 if(!streamingStarted && write != 0) {
                     streamingStarted = true;
                 }
-                allocate.clear();
+                buffer.clear();
             }
 
-            future.get();
+            future.get(); // not interested in the result object, but causes the exceptions to show up
         } catch (InterruptedException e) {
             logger.error("Reader threw exception which cannot be recovered.", e);
         } catch (ExecutionException e) {
@@ -183,6 +188,7 @@ class Worker implements Runnable {
 
     /**
      * Opens a pipe
+     *
      * @return the pipe
      * @throws HandlerException if the pipe could not be opened
      */
@@ -218,6 +224,12 @@ class Worker implements Runnable {
         }
     }
 
+    /**
+     * Handles the keep alive header
+     * @param request the request containing the header
+     * @param channel the channel to take care of
+     * @throws HandlerException if the socket keep alive could not be set
+     */
     private void handleKeepAlive(Request request, SocketChannel channel) throws HandlerException {
         String connection = request.getHeaders().get("Connection");
         if (connection != null && "Keep-Alive".equalsIgnoreCase(connection)) {

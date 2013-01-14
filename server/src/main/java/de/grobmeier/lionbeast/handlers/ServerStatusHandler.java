@@ -23,7 +23,10 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 /**
- * Reports a server status
+ * Reports a server status.
+ *
+ * This is a very special handler, as it reports exceptions as final chance to communicate
+ * to the client. No other handlers are expected to get information injected from the worker.
  */
 public class ServerStatusHandler extends AbstractHandler {
     private static final Logger logger = LoggerFactory.getLogger(ServerStatusHandler.class);

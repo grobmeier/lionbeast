@@ -212,7 +212,7 @@ public class Dispatcher {
         }
 
         if (parser.request().getHeaders() == null) {
-            logger.debug("Request timed out, nothing to do. Discarding");
+            logger.debug("Keep-Alive Socket/Request timed out, nothing to do. Discarding");
             key.cancel();
             keys.remove();
             channel.close();

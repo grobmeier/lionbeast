@@ -27,16 +27,28 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 
 /**
- * TODO: JavaDoc
- * <p/>
- * (c) 2013 Christian Grobmeier Software
- * All rights reserved.
- * mailto:cg@grobmeier.de
+ * A handler is an object which actually works on the resource selected by the url.
+ * It is not necessary selecting a file to operate with; it can dynamically create its own content,
+ * run scripting machines and so on.
  */
 public interface Handler extends Callable<Boolean> {
 
+    /**
+     * Sets the sink channel to which handlers should write
+     * @param sinkChannel the channel to write
+     */
     void setChannel(Pipe.SinkChannel sinkChannel);
+
+    /**
+     * Sets the request to the channel. The request headers will be used for some operations.
+     * @param request the request
+     */
     void setRequest(Request request);
+
+    /**
+     * sets the default content type. The Handler can choose to not use the default.
+     * @param contentType the content type
+     */
     void setDefaultContentType(String contentType);
 
 }

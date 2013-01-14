@@ -1,7 +1,8 @@
 package de.grobmeier.lionbeast.configuration;
 
 /**
- * The definition of a handler
+ * The definition of a handler which at least contains of name
+ * and full qualified class name.
  */
 public class HandlerDefinition {
     private String className;

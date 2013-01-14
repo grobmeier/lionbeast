@@ -20,8 +20,13 @@ public class MatcherConfiguration {
     private Map<String, Matcher> fileEndingMatcher = new HashMap<String, Matcher>();
     private Map<String, Matcher> pathMatcher = new HashMap<String, Matcher>();
 
+    /* Only the configurator should create this object */
+    MatcherConfiguration() {
+    }
+
     /**
      * Initializes the matcher configuration
+     *
      * @return the ready to use matcher configuration
      * @throws ServerInitializationException if the configuration could not be loaded
      */
@@ -72,6 +77,9 @@ public class MatcherConfiguration {
         }
     }
 
+    /**
+     * Divides the matchers into patch-matchers and fileending-matchers.
+     */
     private void initMatcherMaps() {
         for (Matcher matcher : matchers) {
             if(Matcher.Type.FILEENDING == matcher.getType()) {
@@ -90,10 +98,18 @@ public class MatcherConfiguration {
         return matchers;
     }
 
+    /**
+     * returns the file ending matchers
+     * @return the file ending matchers
+     */
     public Map<String, Matcher> getFileEndingMatcher() {
         return fileEndingMatcher;
     }
 
+    /**
+     * returns the path matchers
+     * @return the path matchers
+     */
     public Map<String, Matcher> getPathMatcher() {
         return pathMatcher;
     }
