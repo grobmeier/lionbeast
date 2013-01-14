@@ -27,6 +27,7 @@ public enum StatusCode {
     FORBIDDEN(403, "Forbidden"),
     NOT_FOUND(404, "Not Found"),
     INTERNAL_SERVER_ERROR(505, "Internal Server Error");
+    // many more missing
 
     int code;
     String reasonPhrase;
