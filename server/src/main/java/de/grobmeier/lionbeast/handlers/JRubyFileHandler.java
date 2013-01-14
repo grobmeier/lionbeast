@@ -8,14 +8,21 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Writer;
-import java.nio.ByteBuffer;
-import java.nio.channels.Pipe;
 import java.nio.charset.Charset;
 
 /**
- * Hello World Handler prints just... hello world.
+ * JRuby Handler.
+ *
+ * This class is not optimized, its just there for demonstration purposes.
+ *
+ * The ScriptingEngine creation and the setting of the writerWrapper does take a lot of time.
+ * For example, in local tests call would take around 1.45 seconds.
+ *
+ * When initializing the ScriptingContainer only one time it would take the half of the time. Before doing so,
+ * one needs to check if the JRuby Scripting Container would work in a multithreaded environment.
  */
 public class JRubyFileHandler extends AbstractHandler {
+
     @Override
     public Boolean call() throws HandlerException {
         FileInputStream fis;
@@ -30,9 +37,18 @@ public class JRubyFileHandler extends AbstractHandler {
             this.streamDefaultKeepAlive();
             this.streamDefaultContentType();
 
+            // Creation of the ScriptingContainer uses a lot of time. Should be optimized
+            WriterWrapper writerWrapper = new WriterWrapper();
+
             ScriptingContainer container = new ScriptingContainer();
-            container.setWriter(new WriterWrapper());
+            container.setWriter(writerWrapper);
             container.runScriptlet(fis, requestUri);
+
+            String result = writerWrapper.builder.toString();
+            this.streamHeaders("Content-Length", Long.toString(result.length()));
+
+            streamData(
+                Charset.forName("UTF-8").encode(result.toString()));
 
         }  catch (FileNotFoundException e) {
             throw new HandlerException(StatusCode.NOT_FOUND);
@@ -46,17 +62,15 @@ public class JRubyFileHandler extends AbstractHandler {
         return Boolean.TRUE;
     }
 
+    /*
+     * Dear reader, I am sorry for this.
+     */
     private class WriterWrapper extends Writer {
+        StringBuilder builder = new StringBuilder();
+
         @Override
         public void write(char[] chars, int i, int i2) throws IOException {
-            String str = new String(chars);
-
-            ByteBuffer buffer = Charset.forName("UTF-8").encode(str);
-            try {
-                streamData(buffer);
-            } catch (HandlerException e) {
-                e.printStackTrace();
-            }
+            builder.append(chars);
         }
 
         @Override
