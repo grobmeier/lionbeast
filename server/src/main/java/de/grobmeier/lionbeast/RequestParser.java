@@ -30,15 +30,19 @@ import java.util.Set;
  *
  * Its a line wise parser which stops on a blank line ended with CRLF.
  * Client data should not be processed here, a better place is the Worker thread.
+ *
+ * This class is not thread safe.
  */
 class RequestParser {
     private static final Logger logger = LoggerFactory.getLogger(RequestParser.class);
 
-    enum State {
+    /* the internal state of this parser */
+    private enum State {
         NOT_STARTED, STARTED, HEADER_COMPLETED;
     }
 
-    State current = State.NOT_STARTED;
+    /* the current state */
+    private State current = State.NOT_STARTED;
 
     private final static Charset UTF8_CHARSET = Charset.forName("UTF-8");
 
@@ -46,7 +50,6 @@ class RequestParser {
     private final static char LINEFEED = '\n';
 
     private StringBuilder line = new StringBuilder();
-
     private Map<String, String> headers;
 
     /**

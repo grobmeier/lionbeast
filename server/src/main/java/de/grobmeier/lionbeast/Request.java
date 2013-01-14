@@ -19,18 +19,25 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Representation of a HTTP request
+ * Representation of a HTTP request.
+ *
+ * Actually this request is very basic; no data is included, just headers.
  */
 public class Request {
     private Map<String, String> headers = new HashMap<String, String>();
 
-    public Request() {
-    }
-
+    /**
+     * Sets the header map
+     * @param headers the headers
+     */
     public void setHeaders(Map<String, String> headers) {
         this.headers = headers;
     }
 
+    /**
+     * Returns the header map
+     * @return the headers
+     */
     public Map<String, String> getHeaders() {
         return headers;
     }
