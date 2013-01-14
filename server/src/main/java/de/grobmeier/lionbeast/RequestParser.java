@@ -27,6 +27,9 @@ import java.util.Set;
 
 /**
  * Parses the incoming HTTP request.
+ *
+ * Its a line wise parser which stops on a blank line ended with CRLF.
+ * Client data should not be processed here, a better place is the Worker thread.
  */
 class RequestParser {
     private static final Logger logger = LoggerFactory.getLogger(RequestParser.class);
@@ -42,7 +45,6 @@ class RequestParser {
     private final static char CARRIAGE_RETURN = '\r';
     private final static char LINEFEED = '\n';
 
-    private StringBuilder sink = new StringBuilder();
     private StringBuilder line = new StringBuilder();
 
     private Map<String, String> headers;
@@ -69,11 +71,10 @@ class RequestParser {
      * @param buffer the received data from the client
      * @return true, if the end of headers have been reached
      */
-    boolean onRead(ByteBuffer buffer) {
+    boolean onRead(ByteBuffer buffer) throws ServerException {
         CharBuffer charBuffer = UTF8_CHARSET.decode(buffer);
-        sink.append( charBuffer.toString() );
 
-        while(charBuffer.hasRemaining()) {
+        while (charBuffer.hasRemaining()) {
             char c = charBuffer.get();
 
             // As per recommendation, ignore the first \r\n if buggy HTTP 1.0 clients send them
@@ -85,15 +86,15 @@ class RequestParser {
 
             //  Linefeeds are not allowed inside datablocks and can be used as line terminators (without CR)
             if (c == LINEFEED) {
-                if(line.length() == 0) {
+                if (line.length() == 0) {
                     // Header ends here
-                    if(charBuffer.hasRemaining()) {
+                    if (charBuffer.hasRemaining()) {
                         logger.warn("CharBuffer has remaining chars, but the end of the header has been reached");
                     }
                     logger.debug("Reached the end of header");
                     current = State.HEADER_COMPLETED;
 
-                    if(logger.isDebugEnabled()) {
+                    if (logger.isDebugEnabled()) {
                         Set<String> keys = headers.keySet();
                         for (String key : keys) {
                             logger.debug("Found header: {} -> {}", key, headers.get(key));
@@ -105,7 +106,7 @@ class RequestParser {
                 interpretLine();
             }
 
-            if(c != CARRIAGE_RETURN && c != LINEFEED) {
+            if (c != CARRIAGE_RETURN && c != LINEFEED) {
                 line.append(c);
             }
         }
@@ -131,26 +132,30 @@ class RequestParser {
      * Other headers are split by colon and stored as key/value pairs without further
      * processing.
      */
-    private void interpretLine() {
-        if(headers == null) {
+    private void interpretLine() throws ServerException {
+        if (headers == null) {
             headers = new HashMap<String, String>();
             String startLine = line.toString();
             headers.put("start-line", startLine);
 
-            String[] startLineParts = startLine.split(" ");
+            String[] split = startLine.split(" ");
 
-            if(startLineParts.length != 3) {
-                logger.error("Start-Line has not the expected size");
-                // TODO: server can come done because of this. Throw exception, catch it in the main loop
-                // throw new HttpException(400);
+            if(split.length != 3) {
+                logger.error("Start-Line has not the expected format");
+                throw new ServerException("Start-Line has not the expected format");
             }
 
-            headers.put("method", startLineParts[0]);
-            headers.put("request-uri", startLineParts[1]);
-            headers.put("http-version", startLineParts[2]);
-
+            headers.put("method", split[0]);
+            headers.put("request-uri", split[1]);
+            headers.put("http-version", split[2]);
         } else {
-            String[] split = line.toString().split(":");
+            String[] split = line.toString().split(":", 2);
+
+            if(split.length != 2) {
+                logger.error("Header has not the expected format");
+                throw new ServerException("Header has not the expected format");
+            }
+
             headers.put(split[0], split[1].trim());
         }
 

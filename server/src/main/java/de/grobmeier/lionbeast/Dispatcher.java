@@ -126,7 +126,7 @@ public class Dispatcher {
      * It registers non-blocking on OP_ACCEPT.
      *
      * Reusing addresses is on, as described here:
-     * {@link http://meteatamel.wordpress.com/2010/12/01/socket-reuseaddress-property-and-linux/}
+     * @see <a href="http://meteatamel.wordpress.com/2010/12/01/socket-reuseaddress-property-and-linux/">Meteatamel</a>
      *
      * @param host the host to bind
      * @param port the port to bind
@@ -193,13 +193,21 @@ public class Dispatcher {
 
         SocketChannel channel = (SocketChannel) key.channel();
 
-        ByteBuffer buffer = ByteBuffer.allocate(10);
+        ByteBuffer buffer = ByteBuffer.allocate(100);
         RequestParser parser = new RequestParser();
 
         boolean endOfStream = false;
         while (channel.read(buffer) != -1 && !endOfStream) {
             buffer.flip();
-            endOfStream = parser.onRead(buffer);
+            try {
+                endOfStream = parser.onRead(buffer);
+            } catch (ServerException e) {
+                logger.error("The request did cause problems with the header. Stopping.");
+                key.cancel();
+                keys.remove();
+                channel.close();
+                return;
+            }
             buffer.clear();
         }
 
