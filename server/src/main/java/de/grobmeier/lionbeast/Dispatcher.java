@@ -34,28 +34,52 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * The dispatcher is the "main loop" of the server. It is a single thread which takes all incoming requests
+ * from the Selector and and takes care the are accepted, read or processed.
+ *
+ * The processing of a request is done multithreaded, while reading and accepting done in the dispatcher thread.
+ *
+ * The dispatcher is reusing the port addresses; it will result in quicker startup after a server crash.
+ */
 public class Dispatcher {
     private static final Logger logger = LoggerFactory.getLogger(Dispatcher.class);
 
+    /* the bound host */
     private String host;
+
+    /* the port this server listens */
     private int port;
 
+    /* the selector channel which listens to incoming requests */
     private Selector selector;
+
+    /* the threadpool for workers */
     private ExecutorService executorService;
+
+    /* the threadpool for ahndlers*/
     private ExecutorService handlerExecutorService;
 
+    /* The handler factors has all handler definition in place and creates handler which process the request*/
     private HandlerFactory handlerFactory = new HandlerFactory();
 
-    public Dispatcher(String host, int port) throws IOException {
+    /**
+     * Creates a new Dispatcher.
+     *
+     * @param host the host to bind to
+     * @param port the port to listen
+     * @param workerSize the size of the worker thread pool
+     * @param handlerSize the size of the handler thread pool
+     * @throws IOException if the Selector could not be opened
+     */
+    public Dispatcher(String host, int port, int workerSize, int handlerSize) throws IOException {
         this.host = host;
         this.port = port;
 
         selector = Selector.open();
 
-        ServerConfiguration config = Configurator.getInstance().getServerConfiguration();
-
-        executorService = Executors.newFixedThreadPool(config.workerThreadPoolSize(), new WorkerThreadFactory());
-        handlerExecutorService = Executors.newFixedThreadPool(config.handlerThreadPoolSize(), new WorkerThreadFactory());
+        executorService = Executors.newFixedThreadPool(workerSize, new WorkerThreadFactory());
+        handlerExecutorService = Executors.newFixedThreadPool(handlerSize, new WorkerThreadFactory());
     }
 
     /**
@@ -66,6 +90,7 @@ public class Dispatcher {
     void listen() throws IOException {
         createChannel(host, port);
 
+        // no graceful shutdown supported
         while (true) {
             logger.debug("Selecting");
             selector.select();
@@ -84,7 +109,7 @@ public class Dispatcher {
                 }
 
                 if (key.isAcceptable()) {
-                    accept(selectionKeys, key);
+                    accept(key);
                 } else if (key.isReadable()) {
                     logger.debug("Request is readable");
                     read(selectionKeys, key);
@@ -100,13 +125,15 @@ public class Dispatcher {
      * Creates a new ServerSocketChannel waiting for evens at given port and host.
      * It registers non-blocking on OP_ACCEPT.
      *
+     * Reusing addresses is on, as described here:
+     * {@link http://meteatamel.wordpress.com/2010/12/01/socket-reuseaddress-property-and-linux/}
+     *
      * @param host the host to bind
      * @param port the port to bind
      * @throws IOException if the channel could not be established
      */
     private void createChannel(String host, int port) throws IOException {
         ServerSocketChannel channel = ServerSocketChannel.open();
-        // http://meteatamel.wordpress.com/2010/12/01/socket-reuseaddress-property-and-linux/
         channel.socket().setReuseAddress(true);
         channel.socket().bind(new InetSocketAddress(host, port));
         channel.configureBlocking(false);
@@ -115,43 +142,49 @@ public class Dispatcher {
 
     /**
      * Accepts an event on a specific channel and registers the channel to catch the OP_READ event.
-     * @param key the selection key
+     *
+     * @param key the selected key
      * @throws IOException if accepting didn't work
      */
-    void accept(Iterator<SelectionKey> keys, SelectionKey key) throws IOException {
+    void accept(SelectionKey key) throws IOException {
         logger.debug("ACCEPTING");
 
         ServerSocketChannel serverSocketChannel = (ServerSocketChannel)key.channel();
-        SocketChannel accepted = serverSocketChannel.accept();
+        SocketChannel channel = serverSocketChannel.accept();
 
         // can return null in non-blocking mode
-        if (accepted == null) {
+        if (channel == null) {
             return;
         }
 
-        accepted.configureBlocking(false);
-        accepted.register(selector, SelectionKey.OP_READ);
+        channel.configureBlocking(false);
+        channel.register(selector, SelectionKey.OP_READ);
     }
 
     /**
-     * Write back to the current channel
+     * Process a response and write back the result to the client channel.
+     * Runs asynchronous using a thread from the handler pool
+     *
      * @param keys iterator to the currently selected keys
      * @param key the current key
      * @throws IOException if writing failed
      */
     void process(Iterator<SelectionKey> keys, SelectionKey key) throws IOException {
-
         keys.remove();
-        key.interestOps(0);
+        key.interestOps(0); // necessary
 
-        executorService.submit(new Worker(keys, key, handlerFactory, handlerExecutorService));
-
+        executorService.submit(
+            new Worker(keys, key, handlerFactory, handlerExecutorService));
     }
 
     /**
-     * Reading from the selected channel
+     * Reads the response from the selected channel.
      *
-     * @param key the current key
+     * Currently only GET requests are supported. If POST (or other) data would have been sent, it should not be
+     * read here. In case of large uploads the main thread would be blocked for a long time. A better place is to just
+     * read the headers and leave the data block reading to the Worker.
+     *
+     * @param key the selected key
      * @throws IOException if writing failed
      */
     void read(Iterator<SelectionKey> keys, SelectionKey key) throws IOException {

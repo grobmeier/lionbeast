@@ -23,12 +23,11 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 
 /**
- * Lionbeast HTTP Server
+ * Configures and launches the HTTP Server
  */
 public class Launcher {
     private static final Logger logger = LoggerFactory.getLogger(Launcher.class);
 
-    // TODO: read port and host from configuration
     public void launch() throws IOException, ServerInitializationException {
         Configurator.configure();
 
@@ -39,10 +38,12 @@ public class Launcher {
         if ( Configurator.getInstance().getMatcherConfiguration().getMatchers().size() == 0 ) {
             logger.warn("No matchers specified in lionbeast-matchers.xml");
         }
-        ServerConfiguration serverConfiguration = Configurator.getInstance().getServerConfiguration();
+        ServerConfiguration config = Configurator.getInstance().getServerConfiguration();
 
         Dispatcher dispatcher =
-                new Dispatcher(serverConfiguration.bindTo(), serverConfiguration.port());
+            new Dispatcher(
+                config.bindTo(), config.port(), config.workerThreadPoolSize(), config.handlerThreadPoolSize());
+
         dispatcher.listen();
     }
 
