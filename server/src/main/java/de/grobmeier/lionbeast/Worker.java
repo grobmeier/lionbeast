@@ -9,14 +9,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.nio.ByteBuffer;
 import java.nio.channels.Pipe;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.Iterator;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -57,8 +56,8 @@ class Worker implements Runnable {
     public void run() {
         logger.debug("WRITING worker with name: {}", Thread.currentThread().getName());
 
+        Request request = (Request)key.attachment();
         SocketChannel channel = (SocketChannel) key.channel();
-        Request request = (Request) key.attachment();
 
         if ("/".equals(request.getHeaders().get("request-uri"))) {
             logger.debug("Overwriting request-uri with welcome file (leaving original status line intact)");
@@ -67,6 +66,7 @@ class Worker implements Runnable {
         }
 
         try {
+            handleKeepAlive(request, channel);
             Handler handler = handlerFactory.createHandler(request);
             write(handler, channel, request);
         } catch (HandlerException e) {
@@ -178,12 +178,36 @@ class Worker implements Runnable {
      * @param exception the exception which should be reported
      */
     private void handleException(SocketChannel channel, HandlerException exception) {
+
+        boolean keepAlive = false;
+        try {
+            keepAlive = channel.socket().getKeepAlive();
+        } catch (SocketException e) {
+            logger.error("Could not read keep alive flag from socket, better close it");
+        }
+
         try {
             ServerStatusHandler handler = (ServerStatusHandler)handlerFactory.createHandler("serverStatus", "text/plain");
+            handler.setKeepAlive(keepAlive);
             handler.setHandlerException(exception);
             write(handler, channel, null);
         } catch (HandlerException e) {
             logger.error("Cannot output server status. Game over.");
+        }
+    }
+
+    private void handleKeepAlive(Request request, SocketChannel channel) throws HandlerException {
+        String connection = request.getHeaders().get("Connection");
+        if (connection != null && "Keep-Alive".equalsIgnoreCase(connection)) {
+            try {
+                logger.debug("Marking keep alive connection");
+                Socket socket = channel.socket();
+                socket.setKeepAlive(true);
+                socket.setSoTimeout(100);
+            } catch (SocketException e) {
+                throw new HandlerException(
+                        StatusCode.INTERNAL_SERVER_ERROR, "Could not set keep alive flag");
+            }
         }
     }
 }

@@ -4,7 +4,6 @@ import de.grobmeier.lionbeast.StatusCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
@@ -15,6 +14,7 @@ public class ServerStatusHandler extends AbstractHandler {
     private static final Logger logger = LoggerFactory.getLogger(ServerStatusHandler.class);
 
     private HandlerException handlerException;
+    private boolean keepAlive;
 
     @Override
     public Boolean call() throws HandlerException {
@@ -25,7 +25,13 @@ public class ServerStatusHandler extends AbstractHandler {
             }
 
             this.streamStatusCode(handlerException.getStatusCode());
-            this.streamDefaultKeepAlive();
+
+            if(keepAlive) {
+                this.streamHeaders("Connection", "keep-alive");
+            } else {
+                this.streamHeaders("Connection", "close");
+            }
+
             this.streamHeaders("Content-Type", "text/html");
 
             StringBuilder builder = new StringBuilder();
@@ -40,6 +46,8 @@ public class ServerStatusHandler extends AbstractHandler {
             builder.append("<pre>").append(handlerException.toString()).append("</pre>");
             builder.append(("</body></html>"));
 
+            this.streamHeaders("Content-Length", Integer.toString(builder.length()));
+
             this.streamData(ByteBuffer.wrap(builder.toString().getBytes()));
         }  finally {
             try {
@@ -53,5 +61,9 @@ public class ServerStatusHandler extends AbstractHandler {
 
     public void setHandlerException(HandlerException handlerException) {
         this.handlerException = handlerException;
+    }
+
+    public void setKeepAlive(boolean keepAlive) {
+        this.keepAlive = keepAlive;
     }
 }

@@ -123,16 +123,6 @@ public class Dispatcher {
      */
     void process(Iterator<SelectionKey> keys, SelectionKey key) throws IOException {
 
-        Request request = (Request)key.attachment();
-
-        String connection = request.getHeaders().get("Connection");
-        if (connection != null && "Keep-Alive".equalsIgnoreCase(connection)) {
-            logger.debug("Marking keep alive connection");
-            Socket socket = ((SocketChannel)key.channel()).socket();
-            socket.setKeepAlive(true);
-            socket.setSoTimeout(100);
-        }
-
         keys.remove();
         key.interestOps(0);
 
