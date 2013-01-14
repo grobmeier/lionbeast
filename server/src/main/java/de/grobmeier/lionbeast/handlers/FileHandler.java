@@ -2,7 +2,10 @@ package de.grobmeier.lionbeast.handlers;
 
 import de.grobmeier.lionbeast.StatusCode;
 import de.grobmeier.lionbeast.configuration.Configurator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -11,6 +14,8 @@ import java.io.IOException;
  * Hello World Handler prints just... hello world.
  */
 public class FileHandler extends AbstractHandler {
+    private static final Logger logger = LoggerFactory.getLogger(FileHandler.class);
+
     @Override
     public Boolean call() throws HandlerException {
         FileInputStream fis;
@@ -19,12 +24,16 @@ public class FileHandler extends AbstractHandler {
             String requestUri = this.request.getHeaders().get("request-uri");
             String root = Configurator.getInstance().getServerConfiguration().documentRoot();
 
-            fis = new FileInputStream(root + requestUri);
+            File file = new File(root + requestUri);
+            long fileLength = file.length();
+            fis = new FileInputStream(file);
 
             this.streamStatusCode(StatusCode.OK);
             this.streamDefaultContentType();
 
             this.streamHeaders("Connection", "close"); // TODO
+            logger.debug("Streaming file with content-length: {}", fileLength);
+            this.streamHeaders("Content-Length", Long.toString(fileLength));
 
             this.streamFile(fis);
 
