@@ -174,7 +174,7 @@ public class Dispatcher {
         key.interestOps(0); // necessary
 
         executorService.submit(
-            new Worker(keys, key, handlerFactory, handlerExecutorService));
+            new Worker(key, handlerFactory, handlerExecutorService));
     }
 
     /**

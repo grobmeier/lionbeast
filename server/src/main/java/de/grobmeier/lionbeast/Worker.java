@@ -30,7 +30,6 @@ import java.nio.ByteBuffer;
 import java.nio.channels.Pipe;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
-import java.util.Iterator;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -45,7 +44,6 @@ import java.util.concurrent.Future;
 class Worker implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(Worker.class);
 
-    private Iterator<java.nio.channels.SelectionKey> keys;
     private SelectionKey key;
     private HandlerFactory handlerFactory;
     private ExecutorService executorService;
@@ -55,13 +53,11 @@ class Worker implements Runnable {
      * The keys are related to the actual request.
      *
      * The worker gets dependencies injected on constructor level.
-     * @param keys the selected keys
      * @param key the selected key
      * @param handlerFactory the handler factory
      * @param executorService Executor service for executing resource reading
      */
-    Worker(Iterator<SelectionKey> keys, SelectionKey key, HandlerFactory handlerFactory, ExecutorService executorService) {
-        this.keys = keys;
+    Worker(SelectionKey key, HandlerFactory handlerFactory, ExecutorService executorService) {
         this.key = key;
         this.handlerFactory = handlerFactory;
         this.executorService = executorService;
