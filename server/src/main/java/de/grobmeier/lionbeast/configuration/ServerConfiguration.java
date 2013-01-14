@@ -39,4 +39,12 @@ public class ServerConfiguration {
     public String welcomeFile() {
         return xmlConfiguration.getString("welcomeFile");
     }
+
+    public int workerThreadPoolSize() {
+        return xmlConfiguration.getInt("workerThreadPoolSize");
+    }
+
+    public int handlerThreadPoolSize() {
+        return xmlConfiguration.getInt("handlerThreadPoolSize");
+    }
 }

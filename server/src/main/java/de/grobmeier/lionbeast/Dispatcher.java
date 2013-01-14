@@ -15,6 +15,8 @@
  */
 package de.grobmeier.lionbeast;
 
+import de.grobmeier.lionbeast.configuration.Configurator;
+import de.grobmeier.lionbeast.configuration.ServerConfiguration;
 import de.grobmeier.lionbeast.handlers.HandlerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,9 +52,10 @@ public class Dispatcher {
 
         selector = Selector.open();
 
-        // TODO: read thread count from config
-        executorService = Executors.newFixedThreadPool(10, new WorkerThreadFactory());
-        handlerExecutorService = Executors.newFixedThreadPool(10, new WorkerThreadFactory());
+        ServerConfiguration config = Configurator.getInstance().getServerConfiguration();
+
+        executorService = Executors.newFixedThreadPool(config.workerThreadPoolSize(), new WorkerThreadFactory());
+        handlerExecutorService = Executors.newFixedThreadPool(config.handlerThreadPoolSize(), new WorkerThreadFactory());
     }
 
     /**
