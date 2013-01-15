@@ -15,6 +15,7 @@
  */
 package de.grobmeier.lionbeast.handlers;
 
+import de.grobmeier.lionbeast.HTTPHeader;
 import de.grobmeier.lionbeast.StatusCode;
 import de.grobmeier.lionbeast.configuration.Configurator;
 import org.jruby.embed.ScriptingContainer;
@@ -43,7 +44,7 @@ public class JRubyFileHandler extends AbstractHandler {
         FileInputStream fis;
 
         try {
-            String requestUri = this.request.getHeaders().get("request-uri");
+            String requestUri = this.request.getHeaders().get(HTTPHeader.LIONBEAST_REQUEST_URI);
             String root = Configurator.getInstance().getServerConfiguration().documentRoot();
 
             fis = new FileInputStream(root + requestUri);
@@ -60,7 +61,7 @@ public class JRubyFileHandler extends AbstractHandler {
             container.runScriptlet(fis, requestUri);
 
             String result = writerWrapper.builder.toString();
-            this.streamHeaders("Content-Length", Long.toString(result.length()));
+            this.streamHeader(HTTPHeader.CONTENT_LENGTH, Long.toString(result.length()));
 
             streamData(
                 Charset.forName("UTF-8").encode(result.toString()));

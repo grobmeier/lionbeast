@@ -15,6 +15,7 @@
  */
 package de.grobmeier.lionbeast.handlers;
 
+import de.grobmeier.lionbeast.HTTPHeader;
 import de.grobmeier.lionbeast.Request;
 import de.grobmeier.lionbeast.StatusCode;
 import de.grobmeier.lionbeast.configuration.Configurator;
@@ -102,7 +103,7 @@ public class HandlerFactory {
         Map<String, Matcher> fileEndingMatcher = matcherConfiguration.getFileEndingMatcher();
         Set<String> fileEndings = fileEndingMatcher.keySet();
 
-        String uri = headers.get("request-uri");
+        String uri = headers.get(HTTPHeader.LIONBEAST_REQUEST_URI);
         for (String fileEnding : fileEndings) {
             if(uri.endsWith(fileEnding)) {
                 return fileEndingMatcher.get(fileEnding);
@@ -121,7 +122,7 @@ public class HandlerFactory {
         Set<String> paths = pathMatcher.keySet();
 
         for (String path : paths) {
-            if (path.equals(headers.get("request-uri"))) {
+            if (path.equals(headers.get(HTTPHeader.LIONBEAST_REQUEST_URI))) {
                 return pathMatcher.get(path);
             }
         }

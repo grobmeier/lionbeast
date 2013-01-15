@@ -139,7 +139,7 @@ class RequestParser {
         if (headers == null) {
             headers = new HashMap<String, String>();
             String startLine = line.toString();
-            headers.put("start-line", startLine);
+            headers.put(HTTPHeader.LIONBEAST_STARTLINE.toString(), startLine);
 
             String[] split = startLine.split(" ");
 
@@ -148,9 +148,9 @@ class RequestParser {
                 throw new ServerException("Start-Line has not the expected format");
             }
 
-            headers.put("method", split[0]);
-            headers.put("request-uri", split[1]);
-            headers.put("http-version", split[2]);
+            headers.put(HTTPHeader.LIONBEAST_METHOD.toString(), split[0]);
+            headers.put(HTTPHeader.LIONBEAST_REQUEST_URI.toString(), split[1]);
+            headers.put(HTTPHeader.LIONBEAST_HTTP_VERSION.toString(), split[2]);
         } else {
             String[] split = line.toString().split(":", 2);
 

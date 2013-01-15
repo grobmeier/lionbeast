@@ -15,6 +15,7 @@
  */
 package de.grobmeier.lionbeast.handlers;
 
+import de.grobmeier.lionbeast.HTTPHeader;
 import de.grobmeier.lionbeast.StatusCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,12 +46,12 @@ public class ServerStatusHandler extends AbstractHandler {
             this.streamStatusCode(handlerException.getStatusCode());
 
             if(keepAlive) {
-                this.streamHeaders("Connection", "keep-alive");
+                this.streamHeader(HTTPHeader.CONNECTION, "keep-alive");
             } else {
-                this.streamHeaders("Connection", "close");
+                this.streamHeader(HTTPHeader.CONNECTION, "close");
             }
 
-            this.streamHeaders("Content-Type", "text/html");
+            this.streamHeader(HTTPHeader.CONTENT_TYPE, "text/html");
 
             StringBuilder builder = new StringBuilder();
             builder
@@ -64,7 +65,7 @@ public class ServerStatusHandler extends AbstractHandler {
             builder.append("<pre>").append(handlerException.toString()).append("</pre>");
             builder.append(("</body></html>"));
 
-            this.streamHeaders("Content-Length", Integer.toString(builder.length()));
+            this.streamHeader(HTTPHeader.CONTENT_LENGTH, Integer.toString(builder.length()));
 
             this.streamData(ByteBuffer.wrap(builder.toString().getBytes()));
         }  finally {

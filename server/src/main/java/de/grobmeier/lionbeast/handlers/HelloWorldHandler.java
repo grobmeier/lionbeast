@@ -15,6 +15,7 @@
  */
 package de.grobmeier.lionbeast.handlers;
 
+import de.grobmeier.lionbeast.HTTPHeader;
 import de.grobmeier.lionbeast.StatusCode;
 
 import java.io.IOException;
@@ -30,13 +31,13 @@ public class HelloWorldHandler extends AbstractHandler {
         try {
             this.streamStatusCode(StatusCode.OK);
             this.streamDefaultKeepAlive();
-            this.streamHeaders("Content-Type", "text/html");
+            this.streamHeader(HTTPHeader.CONTENT_TYPE, "text/html");
 
             // Get Data
             String result = "Hello <b>World</b>, what's up?";
 
             byte[] bytes = result.getBytes();
-            this.streamHeaders("Content-Length", Long.toString(bytes.length));
+            this.streamHeader(HTTPHeader.CONTENT_LENGTH, Long.toString(bytes.length));
 
             this.streamData(ByteBuffer.wrap(bytes));
         } finally {

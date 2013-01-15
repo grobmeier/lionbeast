@@ -15,6 +15,7 @@
  */
 package de.grobmeier.lionbeast.handlers;
 
+import de.grobmeier.lionbeast.HTTPHeader;
 import de.grobmeier.lionbeast.StatusCode;
 import de.grobmeier.lionbeast.configuration.Configurator;
 import org.slf4j.Logger;
@@ -35,25 +36,21 @@ public class FileHandler extends AbstractHandler {
 
     @Override
     public Boolean call() throws HandlerException {
-        FileInputStream fis;
-
         try {
-            String requestUri = this.request.getHeaders().get("request-uri");
+            String requestUri = this.request.getHeaders().get(HTTPHeader.LIONBEAST_REQUEST_URI);
             String root = Configurator.getInstance().getServerConfiguration().documentRoot();
 
             File file = new File(root + requestUri);
+            this.streamStatusCode(StatusCode.OK); // File has been found
+
             long fileLength = file.length();
-            fis = new FileInputStream(file);
-
-            this.streamStatusCode(StatusCode.OK);
-
             logger.debug("Streaming file with content-length: {}", fileLength);
-            this.streamHeaders("Content-Length", Long.toString(fileLength));
+            this.streamHeader(HTTPHeader.CONTENT_LENGTH, Long.toString(fileLength));
 
             this.streamDefaultKeepAlive();
             this.streamDefaultContentType();
 
-            this.streamFile(fis);
+            this.streamFile( new FileInputStream(file) );
         }  catch (FileNotFoundException e) {
             throw new HandlerException(StatusCode.NOT_FOUND);
         } finally {
