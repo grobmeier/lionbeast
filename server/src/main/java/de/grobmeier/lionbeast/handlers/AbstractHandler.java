@@ -76,7 +76,7 @@ abstract class AbstractHandler implements Handler {
      * @throws HandlerException if the output could not be written
      */
     protected void streamDefaultKeepAlive() throws HandlerException {
-        this.streamHeader(HTTPHeader.CONNECTION, request.getHeaders().get("Connection"));
+        this.streamHeader(HTTPHeader.CONNECTION, request.getHeaders().get(HTTPHeader.CONNECTION.toString()));
     }
 
     /**

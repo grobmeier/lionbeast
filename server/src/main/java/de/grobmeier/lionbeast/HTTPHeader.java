@@ -1,11 +1,7 @@
 package de.grobmeier.lionbeast;
 
 /**
- * TODO: JavaDoc
- * <p/>
- * (c) 2013 Christian Grobmeier Software
- * All rights reserved.
- * mailto:cg@grobmeier.de
+ * Some fields for working with HTTPHeaders
  */
 public enum HTTPHeader {
 

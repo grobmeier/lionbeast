@@ -232,7 +232,7 @@ class Worker implements Runnable {
      */
     private void handleKeepAlive(Request request, SocketChannel channel) throws HandlerException {
         String connection = request.getHeaders().get(HTTPHeader.CONNECTION.toString());
-        if (connection != null && "Keep-Alive".equalsIgnoreCase(connection)) {
+        if (connection != null && HTTPHeaderValues.KEEP_ALIVE.toString().equalsIgnoreCase(connection)) {
             try {
                 logger.debug("Marking keep alive connection");
                 Socket socket = channel.socket();

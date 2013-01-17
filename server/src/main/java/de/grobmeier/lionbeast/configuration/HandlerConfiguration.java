@@ -1,7 +1,6 @@
 package de.grobmeier.lionbeast.configuration;
 
 import de.grobmeier.lionbeast.ServerInitializationException;
-import de.grobmeier.lionbeast.handlers.Handler;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
@@ -15,6 +14,11 @@ import java.util.Map;
  * Loads and maintains handler configurations
  */
 public class HandlerConfiguration {
+    private static final String FIELD_NAME = "name";
+    private static final String FIELD_CLASS_NAME = "className";
+    private static final String NODE_HANDLER = "handlers.handler";
+    private static final String DEFAULT_CONFIGURATION = "lionbeast-handlers.xml";
+
     private Map<String, HandlerDefinition> handlers = new HashMap<String, HandlerDefinition>();
 
     /* Only the configurator should create this object */
@@ -30,9 +34,9 @@ public class HandlerConfiguration {
     HandlerConfiguration init() throws ServerInitializationException {
         XMLConfiguration config;
         try {
-            config = new XMLConfiguration("lionbeast-handlers.xml");
+            config = new XMLConfiguration(DEFAULT_CONFIGURATION);
         } catch (ConfigurationException e) {
-            throw new ServerInitializationException("Could not load lionbeast-matchers.xml", e);
+            throw new ServerInitializationException("Could not load hanlders configuration file.", e);
         }
 
         initHandlers(config);
@@ -62,7 +66,7 @@ public class HandlerConfiguration {
      * @param config the configuration file (as xml)
      */
     private void initHandlers(XMLConfiguration config) {
-        List<HierarchicalConfiguration> handlers = config.configurationsAt("handlers.handler");
+        List<HierarchicalConfiguration> handlers = config.configurationsAt(NODE_HANDLER);
         for (HierarchicalConfiguration handler : handlers) {
             List<ConfigurationNode> attributes = handler.getRoot().getAttributes();
 
@@ -71,10 +75,14 @@ public class HandlerConfiguration {
             for (ConfigurationNode attribute : attributes) {
                 String value = attribute.getValue().toString();
 
-                if ("name".equalsIgnoreCase(attribute.getName())) {
+
+                if (FIELD_NAME.equalsIgnoreCase(attribute.getName())) {
                     definition.setName(value);
-                } else if ("className".equalsIgnoreCase(attribute.getName())) {
-                    definition.setClassName(value);
+                } else {
+
+                    if (FIELD_CLASS_NAME.equalsIgnoreCase(attribute.getName())) {
+                        definition.setClassName(value);
+                    }
                 }
             }
 

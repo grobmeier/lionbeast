@@ -15,6 +15,12 @@ import java.util.Map;
  * The matcher configuration
  */
 public class MatcherConfiguration {
+    private static final String DEFAULT_CONFIGURATION = "lionbeast-matchers.xml";
+    private static final String NODE_MATCH = "matchers.match";
+    private static final String FIELD_TYPE = "type";
+    private static final String FIELD_REF = "ref";
+    private static final String FIELD_CONTENT_TYPE = "contentType";
+
     private List<Matcher> matchers = new ArrayList<Matcher>();
 
     private Map<String, Matcher> fileEndingMatcher = new HashMap<String, Matcher>();
@@ -33,9 +39,9 @@ public class MatcherConfiguration {
     MatcherConfiguration init() throws ServerInitializationException {
         XMLConfiguration config;
         try {
-            config = new XMLConfiguration("lionbeast-matchers.xml");
+            config = new XMLConfiguration(DEFAULT_CONFIGURATION);
         } catch (ConfigurationException e) {
-            throw new ServerInitializationException("Could not load lionbeast-matchers.xml", e);
+            throw new ServerInitializationException("Could not load matchers configuration file", e);
         }
 
         initMatchers(config);
@@ -51,7 +57,7 @@ public class MatcherConfiguration {
      * Due to the lack of time I am going barefoot.
      */
     private void initMatchers(XMLConfiguration config) {
-        List<HierarchicalConfiguration> matchers = config.configurationsAt("matchers.match");
+        List<HierarchicalConfiguration> matchers = config.configurationsAt(NODE_MATCH);
 
         for (HierarchicalConfiguration matcher : matchers) {
             HierarchicalConfiguration.Node root = matcher.getRoot();
@@ -64,11 +70,11 @@ public class MatcherConfiguration {
             for (ConfigurationNode attribute : attributes) {
                 String value = attribute.getValue().toString();
 
-                if ("type".equalsIgnoreCase(attribute.getName())) {
+                if (FIELD_TYPE.equalsIgnoreCase(attribute.getName())) {
                     entry.setType(value);
-                } else if ("ref".equalsIgnoreCase(attribute.getName())) {
+                } else if (FIELD_REF.equalsIgnoreCase(attribute.getName())) {
                     entry.setRef(value);
-                } else if ("contentType".equalsIgnoreCase(attribute.getName())) {
+                } else if (FIELD_CONTENT_TYPE.equalsIgnoreCase(attribute.getName())) {
                     entry.setDefaultContentType(value);
                 }
             }
