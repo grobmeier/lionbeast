@@ -15,15 +15,18 @@
  */
 package de.grobmeier.lionbeast;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Representation of a HTTP requestHeaders.
- *
- * Actually this requestHeaders is very basic; no data is included, just headers.
+ * Holds the of HTTP Request-Headers.
  */
 public class RequestHeaders {
+    private static final Logger logger = LoggerFactory.getLogger(RequestHeaders.class);
+
     private Map<String, String> headers = new HashMap<String, String>();
 
     /**
@@ -31,6 +34,10 @@ public class RequestHeaders {
      * @param headers the headers
      */
     public void setHeaders(Map<String, String> headers) {
+        if(headers == null) {
+            headers = new HashMap<String, String>();
+            logger.warn("Setting null value to RequestHeaders. Creating empty header map instead.");
+        }
         this.headers = headers;
     }
 
