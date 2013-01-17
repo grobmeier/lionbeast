@@ -208,7 +208,8 @@ public class Dispatcher {
             buffer.clear();
         }
 
-        if (parser.getRequestHeaders().getHeaders() == null) {
+        final RequestHeaders requestHeaders = parser.getRequestHeaders();
+        if (requestHeaders == null) {
             logger.debug("Keep-Alive Socket/Request timed out, nothing to do. Discarding");
             key.cancel();
             keys.remove();
@@ -217,6 +218,6 @@ public class Dispatcher {
         }
 
         channel.configureBlocking(false);
-        channel.register(selector, SelectionKey.OP_WRITE, parser.getRequestHeaders());
+        channel.register(selector, SelectionKey.OP_WRITE, requestHeaders);
     }
 }

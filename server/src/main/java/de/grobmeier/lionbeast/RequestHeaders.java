@@ -42,6 +42,15 @@ public class RequestHeaders {
     }
 
     /**
+     * Adds a header
+     * @param key the header key, like "Content-Type"
+     * @param value the header value, like "keep-alive", "close", etc
+     */
+    public void addHeader(String key, String value) {
+        this.headers.put(key, value);
+    }
+
+    /**
      * Returns the header map
      * @return the headers
      */

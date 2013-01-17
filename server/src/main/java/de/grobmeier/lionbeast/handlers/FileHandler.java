@@ -37,7 +37,8 @@ public class FileHandler extends AbstractHandler {
     @Override
     public Boolean call() throws HandlerException {
         try {
-            String requestUri = this.requestHeaders.getHeaders().get(HTTPHeader.LIONBEAST_REQUEST_URI);
+            // TODO: get by type
+            String requestUri = this.requestHeaders.getHeaders().get(HTTPHeader.LIONBEAST_REQUEST_URI.toString());
             String root = Configurator.getInstance().getServerConfiguration().documentRoot();
 
             File file = new File(root + requestUri);

@@ -36,6 +36,10 @@ import java.util.Set;
 class RequestParser {
     private static final Logger logger = LoggerFactory.getLogger(RequestParser.class);
 
+    private static final String BLANK = " ";
+    // TODO: also used in AbstractHandler
+    private static final String HEADER_SEPARATOR = ":";
+
     /* the internal state of this parser */
     private enum State {
         NOT_STARTED, STARTED, HEADER_COMPLETED;
@@ -50,7 +54,8 @@ class RequestParser {
     private final static char LINEFEED = '\n';
 
     private StringBuilder line = new StringBuilder();
-    private Map<String, String> headers;
+
+    private RequestHeaders requestHeaders = null;
 
     /**
      * Returns a RequestHeaders object which contains the headers.
@@ -61,11 +66,7 @@ class RequestParser {
         if (current == State.NOT_STARTED || current == State.STARTED) {
             logger.warn("RequestHeaders has not fully read yet");
         }
-
-        RequestHeaders result = new RequestHeaders();
-        result.setHeaders(headers);
-
-        return result;
+        return requestHeaders;
     }
 
     /**
@@ -98,6 +99,7 @@ class RequestParser {
                     current = State.HEADER_COMPLETED;
 
                     if (logger.isDebugEnabled()) {
+                        final Map<String, String> headers = requestHeaders.getHeaders();
                         Set<String> keys = headers.keySet();
                         for (String key : keys) {
                             logger.debug("Found header: {} -> {}", key, headers.get(key));
@@ -136,30 +138,31 @@ class RequestParser {
      * processing.
      */
     private void interpretLine() throws ServerException {
-        if (headers == null) {
-            headers = new HashMap<String, String>();
-            String startLine = line.toString();
-            headers.put(HTTPHeader.LIONBEAST_STARTLINE.toString(), startLine);
+        if (requestHeaders == null) {
+            requestHeaders = new RequestHeaders();
 
-            String[] split = startLine.split(" ");
+            String startLine = line.toString();
+
+            requestHeaders.addHeader(HTTPHeader.LIONBEAST_STARTLINE.toString(), startLine);
+
+            String[] split = startLine.split(BLANK);
 
             if(split.length != 3) {
                 logger.error("Start-Line has not the expected format");
                 throw new ServerException("Start-Line has not the expected format");
             }
 
-            headers.put(HTTPHeader.LIONBEAST_METHOD.toString(), split[0]);
-            headers.put(HTTPHeader.LIONBEAST_REQUEST_URI.toString(), split[1]);
-            headers.put(HTTPHeader.LIONBEAST_HTTP_VERSION.toString(), split[2]);
+            requestHeaders.addHeader(HTTPHeader.LIONBEAST_METHOD.toString(), split[0]);
+            requestHeaders.addHeader(HTTPHeader.LIONBEAST_REQUEST_URI.toString(), split[1]);
+            requestHeaders.addHeader(HTTPHeader.LIONBEAST_HTTP_VERSION.toString(), split[2]);
         } else {
-            String[] split = line.toString().split(":", 2);
+            String[] split = line.toString().split(HEADER_SEPARATOR, 2);
 
             if(split.length != 2) {
                 logger.error("Header has not the expected format");
                 throw new ServerException("Header has not the expected format");
             }
-
-            headers.put(split[0], split[1].trim());
+            requestHeaders.addHeader(split[0], split[1].trim());
         }
 
         // once the line has been interpreted, delete it

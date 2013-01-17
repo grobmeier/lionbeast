@@ -103,7 +103,8 @@ public class HandlerFactory {
         Map<String, Matcher> fileEndingMatcher = matcherConfiguration.getFileEndingMatcher();
         Set<String> fileEndings = fileEndingMatcher.keySet();
 
-        String uri = headers.get(HTTPHeader.LIONBEAST_REQUEST_URI);
+        // TODO get by type
+        String uri = headers.get(HTTPHeader.LIONBEAST_REQUEST_URI.toString());
         for (String fileEnding : fileEndings) {
             if(uri.endsWith(fileEnding)) {
                 return fileEndingMatcher.get(fileEnding);
@@ -122,7 +123,8 @@ public class HandlerFactory {
         Set<String> paths = pathMatcher.keySet();
 
         for (String path : paths) {
-            if (path.equals(headers.get(HTTPHeader.LIONBEAST_REQUEST_URI))) {
+            // TODO get by type
+            if (path.equals(headers.get(HTTPHeader.LIONBEAST_REQUEST_URI.toString()))) {
                 return pathMatcher.get(path);
             }
         }

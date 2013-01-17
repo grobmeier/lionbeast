@@ -44,7 +44,8 @@ public class JRubyFileHandler extends AbstractHandler {
         FileInputStream fis;
 
         try {
-            String requestUri = this.requestHeaders.getHeaders().get(HTTPHeader.LIONBEAST_REQUEST_URI);
+            // TODO by type
+            String requestUri = this.requestHeaders.getHeaders().get(HTTPHeader.LIONBEAST_REQUEST_URI.toString());
             String root = Configurator.getInstance().getServerConfiguration().documentRoot();
 
             fis = new FileInputStream(root + requestUri);
