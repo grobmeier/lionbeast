@@ -16,7 +16,7 @@
 package de.grobmeier.lionbeast.handlers;
 
 import de.grobmeier.lionbeast.HTTPHeader;
-import de.grobmeier.lionbeast.Request;
+import de.grobmeier.lionbeast.RequestHeaders;
 import de.grobmeier.lionbeast.StatusCode;
 import de.grobmeier.lionbeast.configuration.Configurator;
 import de.grobmeier.lionbeast.configuration.HandlerConfiguration;
@@ -39,12 +39,12 @@ public class HandlerFactory {
     /**
      * Creates a handler based on the (header) information from the request.
      *
-     * @param request the Request for which a handler needs to be created
+     * @param requestHeaders the RequestHeaders for which a handler needs to be created
      * @return the ready to use handler
      * @throws HandlerException if the handler could not be created or has not been found
      */
-    public Handler createHandler(Request request) throws HandlerException {
-        Map<String, String> headers = request.getHeaders();
+    public Handler createHandler(RequestHeaders requestHeaders) throws HandlerException {
+        Map<String, String> headers = requestHeaders.getHeaders();
 
         Matcher matcher = checkMatchingPath(headers);
         if (matcher == null) {

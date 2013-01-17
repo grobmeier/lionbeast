@@ -71,15 +71,15 @@ class Worker implements Runnable {
     public void run() {
         logger.debug("WRITING worker with name: {}", Thread.currentThread().getName());
 
-        Request request = (Request)key.attachment();
+        RequestHeaders requestHeaders = (RequestHeaders)key.attachment();
         SocketChannel channel = (SocketChannel) key.channel();
 
-        checkForWelcomeFile(request);
+        checkForWelcomeFile(requestHeaders);
 
         try {
-            handleKeepAlive(request, channel);
-            Handler handler = handlerFactory.createHandler(request);
-            write(handler, channel, request);
+            handleKeepAlive(requestHeaders, channel);
+            Handler handler = handlerFactory.createHandler(requestHeaders);
+            write(handler, channel, requestHeaders);
         } catch (HandlerException e) {
             handleException(channel, e);
         } finally {
@@ -105,12 +105,12 @@ class Worker implements Runnable {
      *
      * For example, if domain.tld is given, it might become domain.tld/index.html
      *
-     * @param request the request to check
+     * @param requestHeaders the requestHeaders to check
      */
-    private void checkForWelcomeFile(Request request) {
-        if ("/".equals(request.getHeaders().get(HTTPHeader.LIONBEAST_REQUEST_URI.toString()))) {
+    private void checkForWelcomeFile(RequestHeaders requestHeaders) {
+        if ("/".equals(requestHeaders.getHeaders().get(HTTPHeader.LIONBEAST_REQUEST_URI.toString()))) {
             logger.debug("Overwriting request-uri with welcome file (leaving original status line intact)");
-            request.getHeaders().put(HTTPHeader.LIONBEAST_REQUEST_URI.toString(),
+            requestHeaders.getHeaders().put(HTTPHeader.LIONBEAST_REQUEST_URI.toString(),
                 Configurator.getInstance().getServerConfiguration().welcomeFile());
         }
     }
@@ -136,10 +136,10 @@ class Worker implements Runnable {
      *
      * @param handler the handler which will perform the data gathering
      * @param channel the client channel to write the data
-     * @param request the original request
+     * @param requestHeaders the original requestHeaders
      * @throws HandlerException if the operation could not complete normally
      */
-    private void write(Handler handler, SocketChannel channel, Request request) throws HandlerException {
+    private void write(Handler handler, SocketChannel channel, RequestHeaders requestHeaders) throws HandlerException {
         boolean streamingStarted = false;
         Pipe.SourceChannel source = null;
         try {
@@ -147,7 +147,7 @@ class Worker implements Runnable {
             source = pipe.source();
 
             handler.setChannel(pipe.sink());
-            handler.setRequest(request);
+            handler.setRequestHeaders(requestHeaders);
 
             Future<Boolean> future = executorService.submit(handler);
 
@@ -226,12 +226,12 @@ class Worker implements Runnable {
 
     /**
      * Handles the keep alive header
-     * @param request the request containing the header
+     * @param requestHeaders the requestHeaders containing the header
      * @param channel the channel to take care of
      * @throws HandlerException if the socket keep alive could not be set
      */
-    private void handleKeepAlive(Request request, SocketChannel channel) throws HandlerException {
-        String connection = request.getHeaders().get(HTTPHeader.CONNECTION.toString());
+    private void handleKeepAlive(RequestHeaders requestHeaders, SocketChannel channel) throws HandlerException {
+        String connection = requestHeaders.getHeaders().get(HTTPHeader.CONNECTION.toString());
         if (connection != null && HTTPHeaderValues.KEEP_ALIVE.toString().equalsIgnoreCase(connection)) {
             try {
                 logger.debug("Marking keep alive connection");

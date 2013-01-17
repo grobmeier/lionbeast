@@ -16,7 +16,7 @@
 package de.grobmeier.lionbeast.handlers;
 
 import de.grobmeier.lionbeast.HTTPHeader;
-import de.grobmeier.lionbeast.Request;
+import de.grobmeier.lionbeast.RequestHeaders;
 import de.grobmeier.lionbeast.StatusCode;
 
 import java.io.FileInputStream;
@@ -47,7 +47,7 @@ abstract class AbstractHandler implements Handler {
     /* the place to write the content to */
     protected Pipe.SinkChannel sinkChannel;
     /* the request  */
-    protected Request request;
+    protected RequestHeaders requestHeaders;
     /* the default content type as defined in lionbeast-matchers.xml*/
     protected String defaultContentType;
 
@@ -81,7 +81,7 @@ abstract class AbstractHandler implements Handler {
      */
     protected void streamDefaultKeepAlive() throws HandlerException {
         this.streamHeader(HTTPHeader.CONNECTION,
-                request.getHeaders().get(HTTPHeader.CONNECTION.toString()));
+                requestHeaders.getHeaders().get(HTTPHeader.CONNECTION.toString()));
     }
 
     /**
@@ -195,8 +195,8 @@ abstract class AbstractHandler implements Handler {
     }
 
     @Override
-    public void setRequest(Request request) {
-        this.request = request;
+    public void setRequestHeaders(RequestHeaders requestHeaders) {
+        this.requestHeaders = requestHeaders;
     }
 
     @Override

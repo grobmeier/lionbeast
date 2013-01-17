@@ -19,11 +19,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Representation of a HTTP request.
+ * Representation of a HTTP requestHeaders.
  *
- * Actually this request is very basic; no data is included, just headers.
+ * Actually this requestHeaders is very basic; no data is included, just headers.
  */
-public class Request {
+public class RequestHeaders {
     private Map<String, String> headers = new HashMap<String, String>();
 
     /**

@@ -53,16 +53,16 @@ class RequestParser {
     private Map<String, String> headers;
 
     /**
-     * Returns a Request object which contains the headers.
+     * Returns a RequestHeaders object which contains the headers.
      *
-     * @return the Request
+     * @return the RequestHeaders
      */
-    Request request() {
+    RequestHeaders request() {
         if (current == State.NOT_STARTED || current == State.STARTED) {
-            logger.warn("Request has not fully read yet");
+            logger.warn("RequestHeaders has not fully read yet");
         }
 
-        Request result = new Request();
+        RequestHeaders result = new RequestHeaders();
         result.setHeaders(headers);
 
         return result;

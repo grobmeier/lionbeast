@@ -15,15 +15,9 @@
  */
 package de.grobmeier.lionbeast.handlers;
 
-import de.grobmeier.lionbeast.Request;
-import de.grobmeier.lionbeast.StatusCode;
+import de.grobmeier.lionbeast.RequestHeaders;
 
-import java.io.IOException;
-import java.nio.channels.ByteChannel;
-import java.nio.channels.Channel;
 import java.nio.channels.Pipe;
-import java.nio.channels.SocketChannel;
-import java.util.Map;
 import java.util.concurrent.Callable;
 
 /**
@@ -40,10 +34,10 @@ public interface Handler extends Callable<Boolean> {
     void setChannel(Pipe.SinkChannel sinkChannel);
 
     /**
-     * Sets the request to the channel. The request headers will be used for some operations.
-     * @param request the request
+     * Sets the requestHeaders to the channel. The requestHeaders headers will be used for some operations.
+     * @param requestHeaders the requestHeaders
      */
-    void setRequest(Request request);
+    void setRequestHeaders(RequestHeaders requestHeaders);
 
     /**
      * sets the default content type. The Handler can choose to not use the default.
