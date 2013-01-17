@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Parses the incoming HTTP request.
+ * Parses the incoming HTTP request headers.
  *
  * Its a line wise parser which stops on a blank line ended with CRLF.
  * Client data should not be processed here, a better place is the Worker thread.
@@ -57,7 +57,7 @@ class RequestParser {
      *
      * @return the RequestHeaders
      */
-    RequestHeaders request() {
+    RequestHeaders getRequestHeaders() {
         if (current == State.NOT_STARTED || current == State.STARTED) {
             logger.warn("RequestHeaders has not fully read yet");
         }

@@ -15,15 +15,12 @@
  */
 package de.grobmeier.lionbeast;
 
-import de.grobmeier.lionbeast.configuration.Configurator;
-import de.grobmeier.lionbeast.configuration.ServerConfiguration;
 import de.grobmeier.lionbeast.handlers.HandlerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
@@ -211,7 +208,7 @@ public class Dispatcher {
             buffer.clear();
         }
 
-        if (parser.request().getHeaders() == null) {
+        if (parser.getRequestHeaders().getHeaders() == null) {
             logger.debug("Keep-Alive Socket/Request timed out, nothing to do. Discarding");
             key.cancel();
             keys.remove();
@@ -220,6 +217,6 @@ public class Dispatcher {
         }
 
         channel.configureBlocking(false);
-        channel.register(selector, SelectionKey.OP_WRITE, parser.request());
+        channel.register(selector, SelectionKey.OP_WRITE, parser.getRequestHeaders());
     }
 }
