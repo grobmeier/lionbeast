@@ -34,8 +34,12 @@ import java.nio.channels.Pipe;
  * to become a full fledged handler.
  */
 abstract class AbstractHandler implements Handler {
+    protected static final String HEADER_SEPARATOR = ": ";
+
+    /* must not be static to avoid multithreading problems - needs to rewind */
     protected ByteBuffer protocol = ByteBuffer.wrap("HTTP/1.1 ".getBytes());
-    protected ByteBuffer CRLF = ByteBuffer.wrap("\r\n".getBytes());
+    /* must not be static to avoid multithreading problems - needs to rewind */
+    protected final ByteBuffer CRLF = ByteBuffer.wrap("\r\n".getBytes());
 
     /* are the headers streaming? */
     private boolean streamingHeaders = false;
@@ -76,7 +80,8 @@ abstract class AbstractHandler implements Handler {
      * @throws HandlerException if the output could not be written
      */
     protected void streamDefaultKeepAlive() throws HandlerException {
-        this.streamHeader(HTTPHeader.CONNECTION, request.getHeaders().get(HTTPHeader.CONNECTION.toString()));
+        this.streamHeader(HTTPHeader.CONNECTION,
+                request.getHeaders().get(HTTPHeader.CONNECTION.toString()));
     }
 
     /**
@@ -111,10 +116,11 @@ abstract class AbstractHandler implements Handler {
             throw new IllegalStateException("Need to stream status code before streaming headers");
         }
 
-        String s = new StringBuilder().append(headerName).append(": ").append(headerValue).toString();
+        String headerLine =
+                new StringBuilder().append(headerName).append(HEADER_SEPARATOR).append(headerValue).toString();
 
         try {
-            sinkChannel.write(ByteBuffer.wrap(s.getBytes()));
+            sinkChannel.write(ByteBuffer.wrap(headerLine.getBytes()));
             sinkChannel.write(CRLF);
         } catch (IOException e) {
             throw new HandlerException(StatusCode.INTERNAL_SERVER_ERROR, "Cannot write to output channel");
