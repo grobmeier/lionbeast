@@ -44,11 +44,9 @@ public class HandlerFactory {
      * @throws HandlerException if the handler could not be created or has not been found
      */
     public Handler createHandler(RequestHeaders requestHeaders) throws HandlerException {
-        Map<String, String> headers = requestHeaders.getHeaders();
-
-        Matcher matcher = checkMatchingPath(headers);
+        Matcher matcher = checkMatchingPath(requestHeaders);
         if (matcher == null) {
-            matcher = checkFileEnding(headers);
+            matcher = checkFileEnding(requestHeaders);
         }
 
         if (matcher == null) {
@@ -99,12 +97,12 @@ public class HandlerFactory {
      * @param headers the headers of this request
      * @return the handler name
      */
-    private Matcher checkFileEnding(Map<String, String> headers) {
+    private Matcher checkFileEnding(RequestHeaders headers) {
         Map<String, Matcher> fileEndingMatcher = matcherConfiguration.getFileEndingMatcher();
         Set<String> fileEndings = fileEndingMatcher.keySet();
 
-        // TODO get by type
-        String uri = headers.get(HTTPHeader.LIONBEAST_REQUEST_URI.toString());
+        String uri = headers.getHeader(HTTPHeader.LIONBEAST_REQUEST_URI);
+
         for (String fileEnding : fileEndings) {
             if(uri.endsWith(fileEnding)) {
                 return fileEndingMatcher.get(fileEnding);
@@ -118,13 +116,12 @@ public class HandlerFactory {
      * @param headers the headers of this request
      * @return the handler name
      */
-    private Matcher checkMatchingPath(Map<String, String> headers) {
+    private Matcher checkMatchingPath(RequestHeaders headers) {
         Map<String, Matcher> pathMatcher = matcherConfiguration.getPathMatcher();
         Set<String> paths = pathMatcher.keySet();
 
         for (String path : paths) {
-            // TODO get by type
-            if (path.equals(headers.get(HTTPHeader.LIONBEAST_REQUEST_URI.toString()))) {
+            if (path.equals(headers.getHeader(HTTPHeader.LIONBEAST_REQUEST_URI))) {
                 return pathMatcher.get(path);
             }
         }
