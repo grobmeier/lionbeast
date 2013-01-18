@@ -179,7 +179,8 @@ public class Dispatcher {
      *
      * Currently only GET requests are supported. If POST (or other) data would have been sent, it should not be
      * read here. In case of large uploads the main thread would be blocked for a long time. A better place is to just
-     * read the headers and leave the data block reading to the Worker.
+     * read the headers and leave the data block reading to the Worker. In this case: if there has been to much
+     * bytes from the stream, the channel must be rewinded to the position of the incomming data block.
      *
      * @param key the selected key
      * @throws IOException if writing failed
