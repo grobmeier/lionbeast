@@ -15,7 +15,6 @@
  */
 package de.grobmeier.lionbeast;
 
-import de.grobmeier.lionbeast.configuration.Configurator;
 import de.grobmeier.lionbeast.handlers.Handler;
 import de.grobmeier.lionbeast.handlers.HandlerException;
 import de.grobmeier.lionbeast.handlers.HandlerFactory;
@@ -74,7 +73,7 @@ class Worker implements Runnable {
         RequestHeaders requestHeaders = (RequestHeaders)key.attachment();
         SocketChannel channel = (SocketChannel) key.channel();
 
-        checkForWelcomeFile(requestHeaders);
+        requestHeaders.normalizeWelcomeFile();
 
         try {
             handleKeepAlive(requestHeaders, channel);
@@ -97,22 +96,6 @@ class Worker implements Runnable {
             } catch (IOException e) {
                 logger.error("Could not close client channel.", e);
             }
-        }
-    }
-
-    /**
-     * Checks and (if it matches) replaces the request-uri with the uri of the welcome file.
-     *
-     * For example, if domain.tld is given, it might become domain.tld/index.html
-     *
-     * @param requestHeaders the requestHeaders to check
-     */
-    private void checkForWelcomeFile(RequestHeaders requestHeaders) {
-        if ("/".equals(requestHeaders.getHeader(HTTPHeader.LIONBEAST_REQUEST_URI))) {
-            logger.debug("Overwriting request-uri with welcome file (leaving original status line intact)");
-            requestHeaders.addHeader(
-                HTTPHeader.LIONBEAST_REQUEST_URI,
-                Configurator.getInstance().getServerConfiguration().welcomeFile());
         }
     }
 

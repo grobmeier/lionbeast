@@ -15,6 +15,7 @@
  */
 package de.grobmeier.lionbeast;
 
+import de.grobmeier.lionbeast.configuration.Configurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,6 +29,20 @@ public class RequestHeaders {
     private static final Logger logger = LoggerFactory.getLogger(RequestHeaders.class);
 
     private Map<String, String> headers = new HashMap<String, String>();
+
+    /**
+     * Checks and (if it matches) replaces the request-uri with the uri of the welcome file.
+     *
+     * For example, if domain.tld is given, it might become domain.tld/index.html
+     */
+    public void normalizeWelcomeFile() {
+        if ("/".equals(this.getHeader(HTTPHeader.LIONBEAST_REQUEST_URI))) {
+            logger.debug("Overwriting request-uri with welcome file (leaving original status line intact)");
+            this.addHeader(
+                HTTPHeader.LIONBEAST_REQUEST_URI,
+                Configurator.getInstance().getServerConfiguration().welcomeFile());
+        }
+    }
 
     /**
      * Sets the header map
