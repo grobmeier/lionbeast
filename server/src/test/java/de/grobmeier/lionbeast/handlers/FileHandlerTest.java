@@ -18,13 +18,11 @@ package de.grobmeier.lionbeast.handlers;
 import de.grobmeier.lionbeast.HTTPHeader;
 import de.grobmeier.lionbeast.HTTPHeaderValues;
 import de.grobmeier.lionbeast.RequestHeaders;
-import de.grobmeier.lionbeast.RequestParser;
 import de.grobmeier.lionbeast.configuration.Configurator;
 import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
