@@ -1,1 +1,1 @@
-puts "Hello JRuby"
+print "Hello JRuby"
