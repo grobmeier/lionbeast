@@ -36,7 +36,7 @@ public class HandlerConfiguration {
         try {
             config = new XMLConfiguration(DEFAULT_CONFIGURATION);
         } catch (ConfigurationException e) {
-            throw new ServerInitializationException("Could not load hanlders configuration file.", e);
+            throw new ServerInitializationException("Could not load handlers configuration file.", e);
         }
 
         initHandlers(config);
