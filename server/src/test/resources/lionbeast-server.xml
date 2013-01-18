@@ -22,6 +22,6 @@
     <documentRoot>server/src/test/webdir</documentRoot>
     <welcomeFile>/index.html</welcomeFile>
     <workerThreadPoolSize>10</workerThreadPoolSize>
-    <handlerThreadPoolSize>10</handlerThreadPoolSize>
+    <handlerThreadPoolSize>15</handlerThreadPoolSize>
     <serverEncoding>UTF-8</serverEncoding>
 </config>
