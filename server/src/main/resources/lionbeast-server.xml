@@ -23,4 +23,5 @@
     <welcomeFile>/index.html</welcomeFile>
     <workerThreadPoolSize>10</workerThreadPoolSize>
     <handlerThreadPoolSize>10</handlerThreadPoolSize>
+    <serverEncoding>UTF-8</serverEncoding>
 </config>

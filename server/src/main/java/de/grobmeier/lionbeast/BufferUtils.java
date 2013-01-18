@@ -1,5 +1,7 @@
 package de.grobmeier.lionbeast;
 
+import de.grobmeier.lionbeast.configuration.Configurator;
+
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
@@ -9,7 +11,8 @@ import java.nio.charset.Charset;
  */
 public class BufferUtils {
 
-    private final static Charset UTF8_CHARSET = Charset.forName("UTF-8");
+    private final static Charset CHARSET = Charset.forName(
+            Configurator.getInstance().getServerConfiguration().serverEncoding());
 
     /**
      * Decodes a byte buffer to a char buffer with this servers encoding
@@ -17,7 +20,7 @@ public class BufferUtils {
      * @return a char buffer decoded with the selected charset
      */
     public static CharBuffer decode(ByteBuffer buffer) {
-        return UTF8_CHARSET.decode(buffer);
+        return CHARSET.decode(buffer);
     }
 
     /**
@@ -26,6 +29,6 @@ public class BufferUtils {
      * @return the ByteBuffer
      */
     public static ByteBuffer encode(String value) {
-        return UTF8_CHARSET.encode(value.toString());
+        return CHARSET.encode(value.toString());
     }
 }

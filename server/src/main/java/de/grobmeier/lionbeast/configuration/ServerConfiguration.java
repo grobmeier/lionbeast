@@ -15,6 +15,7 @@ public class ServerConfiguration {
     private static final String FIELD_WELCOME_FILE = "welcomeFile";
     private static final String FIELD_WORKER_THREAD_POOL_SIZE = "workerThreadPoolSize";
     private static final String FILD_HANDLER_THREAD_POOL_SIZE = "handlerThreadPoolSize";
+    private static final String SERVER_ENCODING = "serverEncoding";
 
     private XMLConfiguration xmlConfiguration = null;
 
@@ -82,5 +83,13 @@ public class ServerConfiguration {
      */
     public int handlerThreadPoolSize() {
         return xmlConfiguration.getInt(FILD_HANDLER_THREAD_POOL_SIZE);
+    }
+
+    /**
+     * Returns the preferred charset encoding for this server
+     * @return the preferred charset encoding for this server
+     */
+    public String serverEncoding() {
+        return xmlConfiguration.getString(SERVER_ENCODING);
     }
 }
