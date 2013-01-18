@@ -36,7 +36,7 @@ public class MatcherConfigurationTest {
             Matcher matcher = new Matcher();
             matcher.setRef("helloworld");
             matcher.setType("FILEENDING");
-            matcher.setExpression("html");
+            matcher.setExpression(".html");
             matcher.setDefaultContentType("text/plain");
 
             expected.add(matcher);
@@ -46,7 +46,7 @@ public class MatcherConfigurationTest {
             Matcher matcher = new Matcher();
             matcher.setRef("helloworld");
             matcher.setType("FILEENDING");
-            matcher.setExpression("shtml");
+            matcher.setExpression(".shtml");
             matcher.setDefaultContentType("text/plain");
             expected.add(matcher);
         }
@@ -55,7 +55,7 @@ public class MatcherConfigurationTest {
             Matcher matcher = new Matcher();
             matcher.setRef("helloworld");
             matcher.setType("FILEENDING");
-            matcher.setExpression("htm");
+            matcher.setExpression(".htm");
             matcher.setDefaultContentType("text/plain");
             expected.add(matcher);
         }
@@ -69,8 +69,17 @@ public class MatcherConfigurationTest {
             expected.add(matcher);
         }
 
+        {
+            Matcher matcher = new Matcher();
+            matcher.setRef("file");
+            matcher.setType("FILEENDING");
+            matcher.setExpression(".txt");
+            matcher.setDefaultContentType("text/plain");
+            expected.add(matcher);
+        }
+
         List<Matcher> matchers = config.getMatchers();
-        Assert.assertEquals(4, matchers.size());
+        Assert.assertEquals(5, matchers.size());
 
         // I don't care on the order of elements, otherwise
         // Assert.assertThat(matchers, Is.is(expected));
