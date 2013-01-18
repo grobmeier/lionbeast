@@ -20,8 +20,9 @@
     <matchers>
         <match type="PATH" ref="helloworld" contentType="text/plain">/helloworld</match>
 
-        <match type="FILEENDING" ref="helloworld" contentType="text/plain">html</match>
-        <match type="FILEENDING" ref="helloworld" contentType="text/plain">shtml</match>
-        <match type="FILEENDING" ref="helloworld" contentType="text/plain">htm</match>
+        <match type="FILEENDING" ref="helloworld" contentType="text/plain">.html</match>
+        <match type="FILEENDING" ref="helloworld" contentType="text/plain">.shtml</match>
+        <match type="FILEENDING" ref="helloworld" contentType="text/plain">.htm</match>
+        <match type="FILEENDING" ref="file" contentType="text/plain">.txt</match>
     </matchers>
 </config>
