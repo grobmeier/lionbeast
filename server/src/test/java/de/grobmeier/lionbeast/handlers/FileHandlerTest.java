@@ -28,6 +28,7 @@ import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.channels.Pipe;
 import java.nio.charset.Charset;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -82,5 +83,28 @@ public class FileHandlerTest {
 
         CharBuffer decode = Charset.forName("UTF-8").decode(ByteBuffer.wrap(bytes));
         Assert.assertEquals(expected, decode.toString());
+    }
+
+    @Test(expected = HandlerException.class)
+    public void testCallFileNotFound() throws Exception {
+        Pipe pipe = Pipe.open();
+
+        RequestHeaders headers = new RequestHeaders();
+        headers.addHeader(HTTPHeader.LIONBEAST_REQUEST_URI, "/xyz.txt");
+
+        FileHandler fileHandler = new FileHandler();
+        fileHandler.setChannel(pipe.sink());
+        fileHandler.setRequestHeaders(headers);
+        fileHandler.setDefaultContentType("text/plain");
+
+        try {
+            executorService.submit(fileHandler).get();
+        } catch (ExecutionException e) {
+            if (e.getCause() instanceof HandlerException) {
+                throw (HandlerException)e.getCause();
+            }
+        }
+
+        Assert.fail("Expected HandlerException");
     }
 }
