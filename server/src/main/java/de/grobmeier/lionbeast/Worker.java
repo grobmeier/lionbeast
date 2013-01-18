@@ -108,9 +108,10 @@ class Worker implements Runnable {
      * @param requestHeaders the requestHeaders to check
      */
     private void checkForWelcomeFile(RequestHeaders requestHeaders) {
-        if ("/".equals(requestHeaders.getHeaders().get(HTTPHeader.LIONBEAST_REQUEST_URI.toString()))) {
+        if ("/".equals(requestHeaders.getHeader(HTTPHeader.LIONBEAST_REQUEST_URI))) {
             logger.debug("Overwriting request-uri with welcome file (leaving original status line intact)");
-            requestHeaders.getHeaders().put(HTTPHeader.LIONBEAST_REQUEST_URI.toString(),
+            requestHeaders.addHeader(
+                HTTPHeader.LIONBEAST_REQUEST_URI,
                 Configurator.getInstance().getServerConfiguration().welcomeFile());
         }
     }
@@ -231,7 +232,7 @@ class Worker implements Runnable {
      * @throws HandlerException if the socket keep alive could not be set
      */
     private void handleKeepAlive(RequestHeaders requestHeaders, SocketChannel channel) throws HandlerException {
-        String connection = requestHeaders.getHeaders().get(HTTPHeader.CONNECTION.toString());
+        String connection = requestHeaders.getHeader(HTTPHeader.CONNECTION);
         if (connection != null && HTTPHeaderValues.KEEP_ALIVE.toString().equalsIgnoreCase(connection)) {
             try {
                 logger.debug("Marking keep alive connection");

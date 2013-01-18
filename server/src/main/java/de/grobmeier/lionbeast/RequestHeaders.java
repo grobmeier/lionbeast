@@ -42,12 +42,30 @@ public class RequestHeaders {
     }
 
     /**
+     * Returns a header by its {@HTTPHeader} type
+     * @param headerType the header type
+     * @return the header value
+     */
+    public String getHeader(HTTPHeader headerType) {
+        return this.headers.get(headerType.toString());
+    }
+
+    /**
      * Adds a header
      * @param key the header key, like "Content-Type"
      * @param value the header value, like "keep-alive", "close", etc
      */
     public void addHeader(String key, String value) {
         this.headers.put(key, value);
+    }
+
+    /**
+     * Adds a header
+     * @param headerType the header type
+     * @param value the header value, like "keep-alive", "close", etc
+     */
+    public void addHeader(HTTPHeader headerType, String value) {
+        this.headers.put(headerType.toString(), value);
     }
 
     /**
