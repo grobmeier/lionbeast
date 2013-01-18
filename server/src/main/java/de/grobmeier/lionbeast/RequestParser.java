@@ -48,8 +48,6 @@ class RequestParser {
     /* the current state */
     private State current = State.NOT_STARTED;
 
-    private final static Charset UTF8_CHARSET = Charset.forName("UTF-8");
-
     private final static char CARRIAGE_RETURN = '\r';
     private final static char LINEFEED = '\n';
 
@@ -76,7 +74,7 @@ class RequestParser {
      * @return true, if the end of headers have been reached
      */
     boolean onRead(ByteBuffer buffer) throws ServerException {
-        CharBuffer charBuffer = UTF8_CHARSET.decode(buffer);
+        CharBuffer charBuffer = BufferUtils.decode(buffer);
 
         while (charBuffer.hasRemaining()) {
             char c = charBuffer.get();

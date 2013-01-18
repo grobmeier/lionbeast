@@ -15,6 +15,7 @@
  */
 package de.grobmeier.lionbeast.handlers;
 
+import de.grobmeier.lionbeast.BufferUtils;
 import de.grobmeier.lionbeast.HTTPHeader;
 import de.grobmeier.lionbeast.StatusCode;
 import de.grobmeier.lionbeast.configuration.Configurator;
@@ -63,8 +64,7 @@ public class JRubyFileHandler extends AbstractHandler {
             String result = writerWrapper.builder.toString();
             this.streamHeader(HTTPHeader.CONTENT_LENGTH, Long.toString(result.length()));
 
-            streamData(
-                Charset.forName("UTF-8").encode(result.toString()));
+            streamData( BufferUtils.encode(result) );
 
         }  catch (FileNotFoundException e) {
             throw new HandlerException(StatusCode.NOT_FOUND);
