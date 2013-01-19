@@ -90,7 +90,9 @@ class Worker implements Runnable {
                     channel.register(key.selector(), SelectionKey.OP_READ);
                 } else {
                     logger.debug("Closing session");
-                    channel.close();
+                    if (channel.isOpen()) {
+                        channel.close();
+                    }
                 }
             } catch (IOException e) {
                 logger.error("Could not close client channel.", e);
@@ -135,6 +137,7 @@ class Worker implements Runnable {
             Future<Boolean> future = executorService.submit(handler);
 
             ByteBuffer buffer = ByteBuffer.allocate(1000);
+
             while (source.read(buffer) != -1) {
                 buffer.flip();
                 // this is the actual write to the client
