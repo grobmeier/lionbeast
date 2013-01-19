@@ -75,20 +75,19 @@ class Worker implements Runnable {
 
         requestHeaders.normalizeWelcomeFile();
 
+        boolean keepAlive = false;
         try {
-            handleKeepAlive(requestHeaders, channel);
+            keepAlive = handleKeepAlive(requestHeaders, channel);
             Handler handler = handlerFactory.createHandler(requestHeaders);
             write(handler, channel, requestHeaders);
         } catch (HandlerException e) {
             handleException(channel, e);
         } finally {
-            Socket socket = channel.socket();
-
             // Close, if not keeping alive
             try {
-                if (socket.getKeepAlive()) {
+                if (keepAlive) {
                     logger.debug("Keep alive detected, push BACK TO READ");
-                    key.channel().register(key.selector(), SelectionKey.OP_READ);
+                    channel.register(key.selector(), SelectionKey.OP_READ);
                 } else {
                     logger.debug("Closing session");
                     channel.close();
@@ -214,7 +213,7 @@ class Worker implements Runnable {
      * @param channel the channel to take care of
      * @throws HandlerException if the socket keep alive could not be set
      */
-    private void handleKeepAlive(RequestHeaders requestHeaders, SocketChannel channel) throws HandlerException {
+    private boolean handleKeepAlive(RequestHeaders requestHeaders, SocketChannel channel) throws HandlerException {
         String connection = requestHeaders.getHeader(HTTPHeader.CONNECTION);
         if (connection != null && HTTPHeaderValues.KEEP_ALIVE.toString().equalsIgnoreCase(connection)) {
             try {
@@ -222,10 +221,12 @@ class Worker implements Runnable {
                 Socket socket = channel.socket();
                 socket.setKeepAlive(true);
                 socket.setSoTimeout(100);
+                return true;
             } catch (SocketException e) {
                 throw new HandlerException(
                         StatusCode.INTERNAL_SERVER_ERROR, "Could not set keep alive flag");
             }
         }
+        return false;
     }
 }
