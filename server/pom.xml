@@ -51,8 +51,8 @@
         </dependency>
 
         <dependency>
-        	<groupId>commons-configuration</groupId>
-        	<artifactId>commons-configuration</artifactId>
+            <groupId>commons-configuration</groupId>
+            <artifactId>commons-configuration</artifactId>
         </dependency>
 
         <dependency>
@@ -73,6 +73,14 @@
         <dependency>
             <groupId>org.apache.logging.log4j.adapters</groupId>
             <artifactId>log4j-slf4j-impl</artifactId>
+        </dependency>
+
+        <!-- TESTING -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <version>1.9.5</version>
+            <scope>test</scope>
         </dependency>
 
         <dependency>

@@ -18,6 +18,7 @@
 -->
 <config>
     <matchers>
+        <match type="PATH" ref="mini" contentType="text/plain">/mini</match>
         <match type="PATH" ref="helloworld" contentType="text/plain">/helloworld</match>
 
         <match type="FILEENDING" ref="helloworld" contentType="text/plain">.html</match>

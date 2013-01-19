@@ -90,4 +90,44 @@ public class ServerStatusHandlerTest {
         CharBuffer decode = Charset.forName("UTF-8").decode(ByteBuffer.wrap(bytes));
         Assert.assertEquals(expected, decode.toString());
     }
+
+    @Test
+        public void testCallWithoutException() throws Exception {
+            String expected =
+                    new StringBuilder()
+                            .append("HTTP/1.1 505 Internal Server Error\r\n")
+                            .append("Connection: Keep-Alive\r\n")
+                            .append("Content-Type: text/html\r\n")
+                            .append("Content-Length: 157\r\n")
+                            .append("\r\n")
+                            .append("<html><head></head><body><h1>505 - Internal Server Error</h1>")
+                            .append("<pre>de.grobmeier.lionbeast.handlers.HandlerException: Internal Server Error</pre></body></html>")
+                            .toString();
+
+            Pipe pipe = Pipe.open();
+            Pipe.SourceChannel source = pipe.source();
+
+            ServerStatusHandler handler = new ServerStatusHandler();
+            handler.setChannel(pipe.sink());
+            handler.setDefaultContentType("text/plain");
+            handler.setKeepAlive(true);
+
+            Future<Boolean> future = executorService.submit(handler);
+
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+            ByteBuffer buffer = ByteBuffer.allocate(1);
+            while (source.read(buffer) != -1) {
+                buffer.flip();
+                out.write(buffer.array());
+                buffer.clear();
+            }
+
+            future.get(); // not interested
+
+            byte[] bytes = out.toByteArray();
+
+            CharBuffer decode = Charset.forName("UTF-8").decode(ByteBuffer.wrap(bytes));
+            Assert.assertEquals(expected, decode.toString());
+        }
 }

@@ -71,6 +71,15 @@ public class MatcherConfigurationTest {
 
         {
             Matcher matcher = new Matcher();
+            matcher.setRef("mini");
+            matcher.setType("PATH");
+            matcher.setExpression("/mini");
+            matcher.setDefaultContentType("text/plain");
+            expected.add(matcher);
+        }
+
+        {
+            Matcher matcher = new Matcher();
             matcher.setRef("file");
             matcher.setType("FILEENDING");
             matcher.setExpression(".txt");
@@ -79,7 +88,7 @@ public class MatcherConfigurationTest {
         }
 
         List<Matcher> matchers = config.getMatchers();
-        Assert.assertEquals(5, matchers.size());
+        Assert.assertEquals(6, matchers.size());
 
         // I don't care on the order of elements, otherwise
         // Assert.assertThat(matchers, Is.is(expected));
