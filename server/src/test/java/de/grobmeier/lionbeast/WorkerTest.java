@@ -42,7 +42,7 @@ public class WorkerTest {
 
     @Before
     public void setUp() throws Exception {
-        executorService = Executors.newFixedThreadPool(5);
+        executorService = Executors.newFixedThreadPool(5, new WorkerThreadFactory());
         Configurator.configure();
     }
 
