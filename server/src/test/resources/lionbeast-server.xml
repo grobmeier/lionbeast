@@ -19,7 +19,7 @@
 <config>
     <bindTo>localhost</bindTo>
     <port>10000</port>
-    <documentRoot>server/src/test/webdir</documentRoot>
+    <documentRoot>src/test/webdir</documentRoot>
     <welcomeFile>/index.html</welcomeFile>
     <workerThreadPoolSize>10</workerThreadPoolSize>
     <handlerThreadPoolSize>15</handlerThreadPoolSize>

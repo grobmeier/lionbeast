@@ -28,7 +28,7 @@ public class ServerConfigurationTest {
         Assert.assertEquals(15, config.handlerThreadPoolSize());
         Assert.assertEquals(10, config.workerThreadPoolSize());
         Assert.assertEquals("localhost", config.bindTo());
-        Assert.assertEquals("server/src/test/webdir", config.documentRoot());
+        Assert.assertEquals("src/test/webdir", config.documentRoot());
         Assert.assertEquals(10000, config.port());
         Assert.assertEquals("/index.html", config.welcomeFile());
     }
