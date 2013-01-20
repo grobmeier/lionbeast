@@ -1,0 +1,1 @@
+java -cp "lib/*:config" de.grobmeier.lionbeast.Launcher

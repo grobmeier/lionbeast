@@ -26,7 +26,8 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
     <groupId>de.grobmeier.lionbeast</groupId>
-    <artifactId>server</artifactId>
+    <artifactId>lionbeast-server</artifactId>
+    <packaging>jar</packaging>
     <version>1.0-SNAPSHOT</version>
     <name>Lionbeast Server</name>
     <properties>
@@ -34,7 +35,30 @@
     </properties>
 
     <build>
+        <finalName>lionbeast-server-${project.version}</finalName>
+
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.4</version>
+                <configuration>
+                    <excludes>
+                        <exclude>**/lionbeast-*.xml</exclude>
+                        <exclude>**/log4j2.xml</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.4</version>
+                <configuration>
+                    <descriptors>
+                        <descriptor>src/assembly/bin.xml</descriptor>
+                    </descriptors>
+                </configuration>
+            </plugin>
+
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>findbugs-maven-plugin</artifactId>
