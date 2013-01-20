@@ -41,6 +41,9 @@ public class FileHandler extends AbstractHandler {
             String root = Configurator.getInstance().getServerConfiguration().documentRoot();
 
             File file = new File(root + requestUri);
+            if (!file.exists()) {
+                throw new HandlerException(StatusCode.NOT_FOUND);
+            }
             this.streamStatusCode(StatusCode.OK); // File has been found
 
             long fileLength = file.length();
