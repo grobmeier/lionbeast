@@ -54,7 +54,7 @@ public class Dispatcher {
     /* the threadpool for workers */
     private ExecutorService executorService;
 
-    /* the threadpool for ahndlers*/
+    /* the threadpool for handlers*/
     private ExecutorService handlerExecutorService;
 
     /* The handler factors has all handler definition in place and creates handler which process the request*/
