@@ -158,9 +158,12 @@ class Worker implements Runnable {
                     throw (HandlerException) cause;
                 }
             }
-            logger.error("Reader threw exception which cannot be recovered.", e);
+
+            logger.error("Reader threw exception which cannot be recovered. Closing connection.", e);
+            closeChannel(channel);
         } catch (IOException e) {
-            logger.error("Cannot read from source or write to out. Cannot recover", e);
+            logger.error("Cannot read from source or write to out. Cannot recover, closing connection.", e);
+            closeChannel(channel);
         } finally {
             try {
                 if (source != null) {
@@ -231,5 +234,23 @@ class Worker implements Runnable {
             }
         }
         return false;
+    }
+
+    /**
+     * Closing channel in case of an emergency.
+     *
+     * When the headers are written and something bad happens, the client might wait for ever to receive the
+     * bytes stated in Content-Length. If we cannot deliver these bytes, we could either send 0x0 until the
+     * response is complete or simply close the connection. Using the 0x0 option would mean we send out corrupt
+     * data and therefore the close-connection option is preferred.
+     *
+     * @param channel the socket channel to close
+     */
+    private void closeChannel(SocketChannel channel) {
+        try {
+            channel.close();
+        } catch (IOException e1) {
+            logger.error("Cannot close socket channel.", e1);
+        }
     }
 }
