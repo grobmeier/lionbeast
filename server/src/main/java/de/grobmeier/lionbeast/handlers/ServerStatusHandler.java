@@ -37,46 +37,38 @@ public class ServerStatusHandler extends AbstractHandler {
     private boolean keepAlive;
 
     @Override
-    public Boolean call() throws HandlerException {
-        try {
-            if(handlerException == null) {
-                logger.error("ServerStatusHandler is called without an exception.");
-                handlerException = new HandlerException(StatusCode.INTERNAL_SERVER_ERROR);
-            }
-
-            this.streamStatusCode(handlerException.getStatusCode());
-
-            if(keepAlive) {
-                this.streamHeader(HTTPHeader.CONNECTION, HTTPHeaderValues.KEEP_ALIVE.toString());
-            } else {
-                this.streamHeader(HTTPHeader.CONNECTION, HTTPHeaderValues.CLOSE.toString());
-            }
-
-            this.streamHeader(HTTPHeader.CONTENT_TYPE, "text/html");
-
-            StringBuilder builder = new StringBuilder();
-            builder
-                .append("<html><head></head><body><h1>")
-                .append(handlerException.getStatusCode().asInt())
-                .append(" - ")
-                .append(handlerException.getStatusCode().getReasonPhrase())
-                .append("</h1>");
-
-
-            builder.append("<pre>").append(handlerException.toString()).append("</pre>");
-            builder.append(("</body></html>"));
-
-            this.streamHeader(HTTPHeader.CONTENT_LENGTH, Integer.toString(builder.length()));
-
-            this.streamData(ByteBuffer.wrap(builder.toString().getBytes()));
-        }  finally {
-            try {
-                this.finish();
-            } catch (IOException e) {
-                throw new HandlerException(StatusCode.INTERNAL_SERVER_ERROR, "Could not close pipe");
-            }
+    protected boolean doCall() throws HandlerException {
+        if(handlerException == null) {
+            logger.error("ServerStatusHandler is called without an exception.");
+            handlerException = new HandlerException(StatusCode.INTERNAL_SERVER_ERROR);
         }
-        return Boolean.TRUE;
+
+        this.streamStatusCode(handlerException.getStatusCode());
+
+        if(keepAlive) {
+            this.streamHeader(HTTPHeader.CONNECTION, HTTPHeaderValues.KEEP_ALIVE.toString());
+        } else {
+            this.streamHeader(HTTPHeader.CONNECTION, HTTPHeaderValues.CLOSE.toString());
+        }
+
+        this.streamHeader(HTTPHeader.CONTENT_TYPE, "text/html");
+
+        StringBuilder builder = new StringBuilder();
+        builder
+            .append("<html><head></head><body><h1>")
+            .append(handlerException.getStatusCode().asInt())
+            .append(" - ")
+            .append(handlerException.getStatusCode().getReasonPhrase())
+            .append("</h1>");
+
+
+        builder.append("<pre>").append(handlerException.toString()).append("</pre>");
+        builder.append(("</body></html>"));
+
+        this.streamHeader(HTTPHeader.CONTENT_LENGTH, Integer.toString(builder.length()));
+
+        this.streamData(ByteBuffer.wrap(builder.toString().getBytes()));
+        return true;
     }
 
     public void setHandlerException(HandlerException handlerException) {

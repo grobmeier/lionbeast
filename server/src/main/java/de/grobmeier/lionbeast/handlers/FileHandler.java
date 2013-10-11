@@ -35,7 +35,7 @@ public class FileHandler extends AbstractHandler {
     private static final Logger logger = LoggerFactory.getLogger(FileHandler.class);
 
     @Override
-    public Boolean call() throws HandlerException {
+    protected boolean doCall() throws HandlerException {
         try {
             String requestUri = this.requestHeaders.getHeader(HTTPHeader.LIONBEAST_REQUEST_URI);
             String root = Configurator.getInstance().getServerConfiguration().documentRoot();
@@ -56,13 +56,7 @@ public class FileHandler extends AbstractHandler {
             this.streamFile( new FileInputStream(file) );
         }  catch (FileNotFoundException e) {
             throw new HandlerException(StatusCode.NOT_FOUND);
-        } finally {
-            try {
-                this.finish();
-            } catch (IOException e) {
-                throw new HandlerException(StatusCode.INTERNAL_SERVER_ERROR, "Could not close pipe");
-            }
         }
-        return Boolean.TRUE;
+        return true;
     }
 }

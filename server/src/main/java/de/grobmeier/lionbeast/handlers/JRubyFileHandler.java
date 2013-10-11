@@ -41,7 +41,7 @@ import java.nio.charset.Charset;
 public class JRubyFileHandler extends AbstractHandler {
 
     @Override
-    public Boolean call() throws HandlerException {
+    protected boolean doCall() throws HandlerException {
         FileInputStream fis;
 
         try {
@@ -68,14 +68,8 @@ public class JRubyFileHandler extends AbstractHandler {
 
         }  catch (FileNotFoundException e) {
             throw new HandlerException(StatusCode.NOT_FOUND);
-        } finally {
-            try {
-                this.finish();
-            } catch (IOException e) {
-                throw new HandlerException(StatusCode.INTERNAL_SERVER_ERROR, "Could not close pipe");
-            }
         }
-        return Boolean.TRUE;
+        return true;
     }
 
     /*
