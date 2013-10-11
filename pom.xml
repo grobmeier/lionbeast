@@ -43,9 +43,9 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-            	<groupId>commons-configuration</groupId>
-            	<artifactId>commons-configuration</artifactId>
-            	<version>1.9</version>
+                <groupId>commons-configuration</groupId>
+                <artifactId>commons-configuration</artifactId>
+                <version>1.9</version>
             </dependency>
 
             <dependency>
