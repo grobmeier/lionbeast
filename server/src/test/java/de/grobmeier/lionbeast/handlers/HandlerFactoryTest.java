@@ -15,6 +15,7 @@
  */
 package de.grobmeier.lionbeast.handlers;
 
+import de.grobmeier.lionbeast.HTTPHeader;
 import de.grobmeier.lionbeast.RequestHeaders;
 import de.grobmeier.lionbeast.configuration.Configurator;
 
@@ -37,8 +38,8 @@ public class HandlerFactoryTest {
     @Test
     public void testCreateHandlerByEnding() throws Exception {
         Map<String, String> headers = new HashMap<String, String>();
-        headers.put("request-uri", "/index.html");
-        headers.put("method", "GET");
+        headers.put(HTTPHeader.LIONBEAST_REQUEST_URI.toString(), "/index.html");
+        headers.put(HTTPHeader.LIONBEAST_METHOD.toString(), "GET");
 
         RequestHeaders requestHeaders = new RequestHeaders();
         requestHeaders.setHeaders(headers);
@@ -53,8 +54,8 @@ public class HandlerFactoryTest {
     @Test
     public void testCreateHandlerByPath() throws Exception {
         Map<String, String> headers = new HashMap<String, String>();
-        headers.put("request-uri", "/helloworld");
-        headers.put("method", "GET");
+        headers.put(HTTPHeader.LIONBEAST_REQUEST_URI.toString(), "/helloworld");
+        headers.put(HTTPHeader.LIONBEAST_METHOD.toString(), "GET");
 
         RequestHeaders requestHeaders = new RequestHeaders();
         requestHeaders.setHeaders(headers);
