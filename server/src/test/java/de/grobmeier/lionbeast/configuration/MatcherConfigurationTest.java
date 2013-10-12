@@ -16,6 +16,7 @@
 package de.grobmeier.lionbeast.configuration;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -26,10 +27,26 @@ import java.util.List;
  */
 public class MatcherConfigurationTest {
 
+    private MatcherConfiguration config;
+
+    @Before
+    public void setUp() throws Exception {
+        config = new MatcherConfiguration().init();
+    }
+
     @Test
     public void testMatcherConfiguration() throws Exception {
-        MatcherConfiguration config = new MatcherConfiguration().init();
+        List<Matcher> expected = createExpectedMatchers();
 
+        List<Matcher> matchers = config.getMatchers();
+        Assert.assertEquals(6, matchers.size());
+
+        // I don't care on the order of elements, otherwise
+        // Assert.assertThat(matchers, Is.is(expected));
+        Assert.assertTrue(matchers.containsAll(expected));
+    }
+
+    private List<Matcher> createExpectedMatchers() {
         List<Matcher> expected = new ArrayList<Matcher>();
 
         {
@@ -86,12 +103,6 @@ public class MatcherConfigurationTest {
             matcher.setDefaultContentType("text/plain");
             expected.add(matcher);
         }
-
-        List<Matcher> matchers = config.getMatchers();
-        Assert.assertEquals(6, matchers.size());
-
-        // I don't care on the order of elements, otherwise
-        // Assert.assertThat(matchers, Is.is(expected));
-        Assert.assertTrue(matchers.containsAll(expected));
+        return expected;
     }
 }
