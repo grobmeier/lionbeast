@@ -45,7 +45,7 @@ public class HandlerFactoryTest {
         Handler handler = factory.createHandler(requestHeaders);
 
         Assert.assertNotNull(handler);
-        Assert.assertEquals("de.grobmeier.lionbeast.handlers.HelloWorldHandler", handler.getClass().getCanonicalName());
+        Assert.assertEquals(HelloWorldHandler.class.getCanonicalName(), handler.getClass().getCanonicalName());
     }
 
     @Test
@@ -58,6 +58,6 @@ public class HandlerFactoryTest {
         Handler handler = factory.createHandler(requestHeaders);
 
         Assert.assertNotNull(handler);
-        Assert.assertEquals("de.grobmeier.lionbeast.handlers.HelloWorldHandler", handler.getClass().getCanonicalName());
+        Assert.assertEquals(HelloWorldHandler.class.getCanonicalName(), handler.getClass().getCanonicalName());
     }
 }
