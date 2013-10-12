@@ -30,26 +30,17 @@ import java.util.Map;
 public class MatcherConfigurationTest {
 
     private MatcherConfiguration config;
+    private List<Matcher> expected;
+    private List<Matcher> fileEndingMatchers;
+    private List<Matcher> pathMatchers;
 
     @Before
     public void setUp() throws Exception {
         config = new MatcherConfiguration().init();
-    }
 
-    @Test
-    public void testMatcherConfiguration() throws Exception {
-        List<Matcher> expected = createExpectedMatchers();
-
-        List<Matcher> matchers = config.getMatchers();
-        Assert.assertEquals(6, matchers.size());
-
-        // I don't care on the order of elements, otherwise
-        // Assert.assertThat(matchers, Is.is(expected));
-        Assert.assertTrue(matchers.containsAll(expected));
-    }
-
-    private List<Matcher> createExpectedMatchers() {
-        List<Matcher> expected = new ArrayList<Matcher>();
+        expected = new ArrayList<Matcher>();
+        fileEndingMatchers = new ArrayList<Matcher>();
+        pathMatchers = new ArrayList<Matcher>();
 
         {
             Matcher matcher = new Matcher();
@@ -57,8 +48,7 @@ public class MatcherConfigurationTest {
             matcher.setType("FILEENDING");
             matcher.setExpression(".html");
             matcher.setDefaultContentType("text/plain");
-
-            expected.add(matcher);
+            fileEndingMatchers.add(matcher);
         }
 
         {
@@ -67,7 +57,7 @@ public class MatcherConfigurationTest {
             matcher.setType("FILEENDING");
             matcher.setExpression(".shtml");
             matcher.setDefaultContentType("text/plain");
-            expected.add(matcher);
+            fileEndingMatchers.add(matcher);
         }
 
         {
@@ -76,25 +66,7 @@ public class MatcherConfigurationTest {
             matcher.setType("FILEENDING");
             matcher.setExpression(".htm");
             matcher.setDefaultContentType("text/plain");
-            expected.add(matcher);
-        }
-
-        {
-            Matcher matcher = new Matcher();
-            matcher.setRef("helloworld");
-            matcher.setType("PATH");
-            matcher.setExpression("/helloworld");
-            matcher.setDefaultContentType("text/plain");
-            expected.add(matcher);
-        }
-
-        {
-            Matcher matcher = new Matcher();
-            matcher.setRef("mini");
-            matcher.setType("PATH");
-            matcher.setExpression("/mini");
-            matcher.setDefaultContentType("text/plain");
-            expected.add(matcher);
+            fileEndingMatchers.add(matcher);
         }
 
         {
@@ -103,30 +75,56 @@ public class MatcherConfigurationTest {
             matcher.setType("FILEENDING");
             matcher.setExpression(".txt");
             matcher.setDefaultContentType("text/plain");
-            expected.add(matcher);
+            fileEndingMatchers.add(matcher);
         }
-        return expected;
+
+        {
+            Matcher matcher = new Matcher();
+            matcher.setRef("helloworld");
+            matcher.setType("PATH");
+            matcher.setExpression("/helloworld");
+            matcher.setDefaultContentType("text/plain");
+            pathMatchers.add(matcher);
+        }
+
+        {
+            Matcher matcher = new Matcher();
+            matcher.setRef("mini");
+            matcher.setType("PATH");
+            matcher.setExpression("/mini");
+            matcher.setDefaultContentType("text/plain");
+            pathMatchers.add(matcher);
+        }
+
+        expected.addAll(pathMatchers);
+        expected.addAll(fileEndingMatchers);
+    }
+
+    @Test
+    public void testMatcherConfiguration() throws Exception {
+        List<Matcher> matchers = config.getMatchers();
+        Assert.assertEquals(6, matchers.size());
+
+        // I don't care on the order of elements, otherwise
+        // Assert.assertThat(matchers, Is.is(expected));
+        Assert.assertTrue(matchers.containsAll(expected));
     }
 
     @Test
     public void testGetFileEndingMatchers() throws Exception {
-        Map<String,Matcher> fileEndingMatchers = config.getFileEndingMatcher();
+        Map<String,Matcher> fileEndingMap = config.getFileEndingMatcher();
 
-        for (Matcher matcher : createExpectedMatchers()) {
-            if (matcher.getType().equals(Matcher.Type.FILEENDING)) {
-                Assert.assertThat(fileEndingMatchers, IsMapContaining.hasEntry(matcher.getExpression(), matcher));
-            }
+        for (Matcher matcher : fileEndingMatchers) {
+            Assert.assertThat(fileEndingMap, IsMapContaining.hasEntry(matcher.getExpression(), matcher));
         }
     }
 
     @Test
     public void testGetPathMatchers() throws Exception {
-        Map<String,Matcher> pathMatchers = config.getPathMatcher();
+        Map<String,Matcher> pathMap = config.getPathMatcher();
 
-        for (Matcher matcher : createExpectedMatchers()) {
-            if (matcher.getType().equals(Matcher.Type.PATH)) {
-                Assert.assertThat(pathMatchers, IsMapContaining.hasEntry(matcher.getExpression(), matcher));
-            }
+        for (Matcher matcher : pathMatchers) {
+            Assert.assertThat(pathMap, IsMapContaining.hasEntry(matcher.getExpression(), matcher));
         }
     }
 
