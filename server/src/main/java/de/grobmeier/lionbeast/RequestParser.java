@@ -141,7 +141,7 @@ class RequestParser {
 
             String startLine = line.toString();
 
-            requestHeaders.addHeader(HTTPHeader.LIONBEAST_STARTLINE.toString(), startLine);
+            requestHeaders.addHeader(HTTPHeader.LIONBEAST_STARTLINE, startLine);
 
             String[] split = startLine.split(BLANK);
 
@@ -150,9 +150,9 @@ class RequestParser {
                 throw new ServerException("Start-Line has not the expected format");
             }
 
-            requestHeaders.addHeader(HTTPHeader.LIONBEAST_METHOD.toString(), split[0]);
-            requestHeaders.addHeader(HTTPHeader.LIONBEAST_REQUEST_URI.toString(), split[1]);
-            requestHeaders.addHeader(HTTPHeader.LIONBEAST_HTTP_VERSION.toString(), split[2]);
+            requestHeaders.addHeader(HTTPHeader.LIONBEAST_METHOD, split[0]);
+            requestHeaders.addHeader(HTTPHeader.LIONBEAST_REQUEST_URI, split[1]);
+            requestHeaders.addHeader(HTTPHeader.LIONBEAST_HTTP_VERSION, split[2]);
         } else {
             String[] split = line.toString().split(HEADER_SEPARATOR, 2);
 
