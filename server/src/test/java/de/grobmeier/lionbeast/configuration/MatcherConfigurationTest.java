@@ -15,6 +15,7 @@
  */
 package de.grobmeier.lionbeast.configuration;
 
+import org.hamcrest.collection.IsCollectionWithSize;
 import org.hamcrest.collection.IsMapContaining;
 import org.junit.Assert;
 import org.junit.Before;
@@ -103,7 +104,7 @@ public class MatcherConfigurationTest {
     @Test
     public void testMatcherConfiguration() throws Exception {
         List<Matcher> matchers = config.getMatchers();
-        Assert.assertEquals(6, matchers.size());
+        Assert.assertThat(matchers, IsCollectionWithSize.hasSize(6));
 
         // I don't care on the order of elements, otherwise
         // Assert.assertThat(matchers, Is.is(expected));
