@@ -19,7 +19,7 @@ import de.grobmeier.lionbeast.HTTPHeader;
 import de.grobmeier.lionbeast.HTTPHeaderValues;
 import de.grobmeier.lionbeast.RequestHeaders;
 import de.grobmeier.lionbeast.configuration.Configurator;
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
