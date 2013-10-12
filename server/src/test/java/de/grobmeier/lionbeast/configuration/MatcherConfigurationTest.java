@@ -109,7 +109,7 @@ public class MatcherConfigurationTest {
     }
 
     @Test
-    public void testMatchers() throws Exception {
+    public void testGetFileEndingMatchers() throws Exception {
         Map<String,Matcher> fileEndingMatchers = config.getFileEndingMatcher();
 
         for (Matcher matcher : createExpectedMatchers()) {
@@ -118,4 +118,16 @@ public class MatcherConfigurationTest {
             }
         }
     }
+
+    @Test
+    public void testGetPathMatchers() throws Exception {
+        Map<String,Matcher> pathMatchers = config.getPathMatcher();
+
+        for (Matcher matcher : createExpectedMatchers()) {
+            if (matcher.getType().equals(Matcher.Type.PATH)) {
+                Assert.assertThat(pathMatchers, IsMapContaining.hasEntry(matcher.getExpression(), matcher));
+            }
+        }
+    }
+
 }
