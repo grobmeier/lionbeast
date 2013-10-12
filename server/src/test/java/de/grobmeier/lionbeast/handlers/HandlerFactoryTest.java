@@ -37,12 +37,9 @@ public class HandlerFactoryTest {
 
     @Test
     public void testCreateHandlerByEnding() throws Exception {
-        Map<String, String> headers = new HashMap<String, String>();
-        headers.put(HTTPHeader.LIONBEAST_REQUEST_URI.toString(), "/index.html");
-        headers.put(HTTPHeader.LIONBEAST_METHOD.toString(), "GET");
-
         RequestHeaders requestHeaders = new RequestHeaders();
-        requestHeaders.setHeaders(headers);
+        requestHeaders.addHeader(HTTPHeader.LIONBEAST_REQUEST_URI, "/index.html");
+        requestHeaders.addHeader(HTTPHeader.LIONBEAST_METHOD, "GET");
 
         HandlerFactory factory = new HandlerFactory();
         Handler handler = factory.createHandler(requestHeaders);
@@ -53,12 +50,9 @@ public class HandlerFactoryTest {
 
     @Test
     public void testCreateHandlerByPath() throws Exception {
-        Map<String, String> headers = new HashMap<String, String>();
-        headers.put(HTTPHeader.LIONBEAST_REQUEST_URI.toString(), "/helloworld");
-        headers.put(HTTPHeader.LIONBEAST_METHOD.toString(), "GET");
-
         RequestHeaders requestHeaders = new RequestHeaders();
-        requestHeaders.setHeaders(headers);
+        requestHeaders.addHeader(HTTPHeader.LIONBEAST_REQUEST_URI, "/helloworld");
+        requestHeaders.addHeader(HTTPHeader.LIONBEAST_METHOD, "GET");
 
         HandlerFactory factory = new HandlerFactory();
         Handler handler = factory.createHandler(requestHeaders);
