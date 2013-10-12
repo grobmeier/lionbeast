@@ -68,7 +68,7 @@ class RequestParser {
     }
 
     /**
-     * Reads from a byte buffer and reasembles lines.
+     * Reads from a byte buffer and reassembles lines.
      *
      * @param buffer the received data from the client
      * @return true, if the end of headers have been reached
