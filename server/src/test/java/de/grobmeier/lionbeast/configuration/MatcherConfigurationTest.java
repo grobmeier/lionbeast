@@ -15,12 +15,14 @@
  */
 package de.grobmeier.lionbeast.configuration;
 
+import org.hamcrest.collection.IsMapContaining;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Testing Matcher Configurations
@@ -104,5 +106,16 @@ public class MatcherConfigurationTest {
             expected.add(matcher);
         }
         return expected;
+    }
+
+    @Test
+    public void testMatchers() throws Exception {
+        Map<String,Matcher> fileEndingMatchers = config.getFileEndingMatcher();
+
+        for (Matcher matcher : createExpectedMatchers()) {
+            if (matcher.getType().equals(Matcher.Type.FILEENDING)) {
+                Assert.assertThat(fileEndingMatchers, IsMapContaining.hasEntry(matcher.getExpression(), matcher));
+            }
+        }
     }
 }
