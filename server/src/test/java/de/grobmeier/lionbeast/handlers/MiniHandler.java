@@ -27,17 +27,9 @@ public class MiniHandler extends AbstractHandler {
     public static final String MESSAGE = "HELLO";
 
     @Override
-    public Boolean call() throws HandlerException {
-        try {
-            ByteBuffer bb = ByteBuffer.wrap(MESSAGE.getBytes());
-            this.streamData(bb);
-        } finally {
-            try {
-                this.finish();
-            } catch (IOException e) {
-                throw new HandlerException(StatusCode.INTERNAL_SERVER_ERROR, "Could not close pipe");
-            }
-        }
-        return Boolean.TRUE;
+    protected boolean doCall() throws HandlerException {
+        ByteBuffer bb = ByteBuffer.wrap(MESSAGE.getBytes());
+        this.streamData(bb);
+        return true;
     }
 }
