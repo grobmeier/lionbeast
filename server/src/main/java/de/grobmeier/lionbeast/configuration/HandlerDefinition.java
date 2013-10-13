@@ -1,7 +1,7 @@
 package de.grobmeier.lionbeast.configuration;
 
 /**
- * The definition of a handler which at least contains of a name
+ * The definition of a handler which at least consists of a name
  * and full qualified class name. The class referenced as a Handler needs
  * to implement the {@link de.grobmeier.lionbeast.handlers.Handler} interface.
  *

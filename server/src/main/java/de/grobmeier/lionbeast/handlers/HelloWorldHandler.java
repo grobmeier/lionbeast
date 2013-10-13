@@ -26,27 +26,20 @@ import java.nio.ByteBuffer;
  * An example for not selecting from hard disc.
  */
 public class HelloWorldHandler extends AbstractHandler {
-    @Override
-    public Boolean call() throws HandlerException {
-        try {
-            this.streamStatusCode(StatusCode.OK);
-            this.streamDefaultKeepAlive();
-            this.streamHeader(HTTPHeader.CONTENT_TYPE, "text/html");
 
-            // Get Data
-            String result = "Hello <b>World</b>, what's up?";
+    protected boolean doCall() throws HandlerException {
+        this.streamStatusCode(StatusCode.OK);
+        this.streamDefaultKeepAlive();
+        this.streamHeader(HTTPHeader.CONTENT_TYPE, "text/html");
 
-            byte[] bytes = result.getBytes();
-            this.streamHeader(HTTPHeader.CONTENT_LENGTH, Long.toString(bytes.length));
+        // Get Data
+        String result = "Hello <b>World</b>, what's up?";
 
-            this.streamData(ByteBuffer.wrap(bytes));
-        } finally {
-            try {
-                this.finish();
-            } catch (IOException e) {
-                throw new HandlerException(StatusCode.INTERNAL_SERVER_ERROR, "Could not close pipe");
-            }
-        }
-        return Boolean.TRUE;
+        byte[] bytes = result.getBytes();
+        this.streamHeader(HTTPHeader.CONTENT_LENGTH, Long.toString(bytes.length));
+
+        this.streamData(ByteBuffer.wrap(bytes));
+
+        return true;
     }
 }

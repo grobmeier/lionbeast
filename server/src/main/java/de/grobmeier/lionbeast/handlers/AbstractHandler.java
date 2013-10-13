@@ -180,6 +180,21 @@ abstract class AbstractHandler implements Handler {
         }
     }
 
+    @Override
+    public Boolean call() throws Exception {
+        try {
+            return Boolean.valueOf(doCall());
+        } finally {
+            try {
+                this.finish();
+            } catch (IOException e) {
+                throw new HandlerException(StatusCode.INTERNAL_SERVER_ERROR, "Could not close pipe");
+            }
+        }
+    }
+
+    protected abstract boolean doCall() throws HandlerException;
+
     /**
      * Finishes the sink write
      *

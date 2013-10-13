@@ -15,6 +15,7 @@
  */
 package de.grobmeier.lionbeast.handlers;
 
+import de.grobmeier.lionbeast.HTTPHeader;
 import de.grobmeier.lionbeast.RequestHeaders;
 import de.grobmeier.lionbeast.configuration.Configurator;
 
@@ -36,33 +37,27 @@ public class HandlerFactoryTest {
 
     @Test
     public void testCreateHandlerByEnding() throws Exception {
-        Map<String, String> headers = new HashMap<String, String>();
-        headers.put("request-uri", "/index.html");
-        headers.put("method", "GET");
-
         RequestHeaders requestHeaders = new RequestHeaders();
-        requestHeaders.setHeaders(headers);
+        requestHeaders.addHeader(HTTPHeader.LIONBEAST_REQUEST_URI, "/index.html");
+        requestHeaders.addHeader(HTTPHeader.LIONBEAST_METHOD, "GET");
 
         HandlerFactory factory = new HandlerFactory();
         Handler handler = factory.createHandler(requestHeaders);
 
         Assert.assertNotNull(handler);
-        Assert.assertEquals("de.grobmeier.lionbeast.handlers.HelloWorldHandler", handler.getClass().getCanonicalName());
+        Assert.assertEquals(HelloWorldHandler.class.getCanonicalName(), handler.getClass().getCanonicalName());
     }
 
     @Test
     public void testCreateHandlerByPath() throws Exception {
-        Map<String, String> headers = new HashMap<String, String>();
-        headers.put("request-uri", "/helloworld");
-        headers.put("method", "GET");
-
         RequestHeaders requestHeaders = new RequestHeaders();
-        requestHeaders.setHeaders(headers);
+        requestHeaders.addHeader(HTTPHeader.LIONBEAST_REQUEST_URI, "/helloworld");
+        requestHeaders.addHeader(HTTPHeader.LIONBEAST_METHOD, "GET");
 
         HandlerFactory factory = new HandlerFactory();
         Handler handler = factory.createHandler(requestHeaders);
 
         Assert.assertNotNull(handler);
-        Assert.assertEquals("de.grobmeier.lionbeast.handlers.HelloWorldHandler", handler.getClass().getCanonicalName());
+        Assert.assertEquals(HelloWorldHandler.class.getCanonicalName(), handler.getClass().getCanonicalName());
     }
 }
