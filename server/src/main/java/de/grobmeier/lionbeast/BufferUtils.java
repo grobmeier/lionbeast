@@ -29,6 +29,6 @@ public class BufferUtils {
      * @return the ByteBuffer
      */
     public static ByteBuffer encode(String value) {
-        return CHARSET.encode(value.toString());
+        return CHARSET.encode(value);
     }
 }
