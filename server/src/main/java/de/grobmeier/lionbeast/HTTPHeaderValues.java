@@ -8,7 +8,7 @@ public enum HTTPHeaderValues {
     KEEP_ALIVE("Keep-Alive"),
     CLOSE("close");
 
-    String value;
+    private String value;
 
     private HTTPHeaderValues(String value) {
         this.value = value;
