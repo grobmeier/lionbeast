@@ -57,7 +57,7 @@ public class RequestHeaders {
     }
 
     /**
-     * Returns a header by its {@HTTPHeader} type
+     * Returns a header by its {@link HTTPHeader} type
      * @param headerType the header type
      * @return the header value
      */

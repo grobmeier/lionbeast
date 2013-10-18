@@ -16,7 +16,7 @@ public enum HTTPHeader {
     LIONBEAST_STARTLINE("start-line");
 
 
-    String value;
+    private String value;
 
     private HTTPHeader(String value) {
         this.value = value;

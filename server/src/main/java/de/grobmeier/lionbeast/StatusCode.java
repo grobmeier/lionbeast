@@ -29,9 +29,9 @@ public enum StatusCode {
     INTERNAL_SERVER_ERROR(505, "Internal Server Error");
     // many more missing
 
-    int code;
-    String reasonPhrase;
-    ByteBuffer statusLine;
+    private int code;
+    private String reasonPhrase;
+    private ByteBuffer statusLine;
 
     private StatusCode(int code, String reasonPhrase) {
         this.code = code;

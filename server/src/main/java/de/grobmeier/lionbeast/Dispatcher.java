@@ -164,11 +164,10 @@ public class Dispatcher {
      *
      * @param keys iterator to the currently selected keys
      * @param key the current key
-     * @throws IOException if writing failed
      */
-    void process(Iterator<SelectionKey> keys, SelectionKey key) throws IOException {
+    void process(Iterator<SelectionKey> keys, SelectionKey key) {
         keys.remove();
-        key.interestOps(0); // necessary
+        key.interestOps(0); // necessary TODO document why this is needed
 
         executorService.submit(
             new Worker(key, handlerFactory, handlerExecutorService));

@@ -18,7 +18,7 @@ package de.grobmeier.lionbeast;
 import de.grobmeier.lionbeast.configuration.Configurator;
 import de.grobmeier.lionbeast.handlers.HandlerFactory;
 import de.grobmeier.lionbeast.handlers.MiniHandler;
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
