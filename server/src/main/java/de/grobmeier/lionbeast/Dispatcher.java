@@ -167,7 +167,7 @@ public class Dispatcher {
      */
     void process(Iterator<SelectionKey> keys, SelectionKey key) {
         keys.remove();
-        key.interestOps(0); // necessary
+        key.interestOps(0); // necessary TODO document why this is needed
 
         executorService.submit(
             new Worker(key, handlerFactory, handlerExecutorService));
