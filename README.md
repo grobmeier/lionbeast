@@ -7,7 +7,9 @@ except for dependency management.
 
 Build the distribution with:
 
+```
 $> mvn package
+```
 
 This will also run the assembly:single goal, which creates a ZIP package with a ready-to-go server.
 
